@@ -1,6 +1,8 @@
+#This code lets you control the arm in the terminal by typing in numbers. It has no window or graphical unterface.
+
 # Simple demo of of the PCA9685 PWM servo/LED controller library.
 # This will move channel 0 from min to max position repeatedly.
-# Author: Tony DiCola
+# Original Author: Tony DiCola
 # License: Public Domain
 from __future__ import division
 import time
