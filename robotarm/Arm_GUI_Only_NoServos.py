@@ -1,3 +1,6 @@
+#This code is just for educational use. It shows a Graphical Interface that you could use to control an arm but has no
+# code to actually run the servos. See the "Arm_GUI" code for the working version of this.
+
 import sys
 import os
 from tkinter import *
