@@ -58,17 +58,15 @@ def resetArmPosition():
 
 
 #outputs servo values to the shell then runs a sequence
-def runSequence(): 
+def runSequence():
+
 
         print ("Starting Position", slider_1.get(), slider_2.get(), slider_3.get(), slider_4.get())
 
         #position 1 in sequence of moves
+        
 
-        r1=534
-        b1=329
-        s1=400
-        c1=163
-
+        
         slider_1.set(r1)
         slider_2.set(b1)
         slider_3.set(s1)
@@ -84,73 +82,121 @@ def runSequence():
         time.sleep(2)
 
         #position 2 in sequence of moves
+        
+        slider_1.set(r2)
+        slider_2.set(b2)
+        slider_3.set(s2)
+        slider_4.set(c2)
 
-        r1=534
-        b1=329
-        s1=322
-        c1=470
+        print ("Position 2",r2, b2, s2, c2)
 
-        slider_1.set(r1)
-        slider_2.set(b1)
-        slider_3.set(s1)
-        slider_4.set(c1)
-
-        print ("Position 1",r1, b1, s1, c1)
-
-        pwm.set_pwm(0, 0, r1)
-        pwm.set_pwm(1, 0, b1)
-        pwm.set_pwm(2, 0, s1)
-        pwm.set_pwm(3, 0, c1)
+        pwm.set_pwm(0, 0, r2)
+        pwm.set_pwm(1, 0, b2)
+        pwm.set_pwm(2, 0, s2)
+        pwm.set_pwm(3, 0, c2)
         
         time.sleep(2)
 
 
         #position 3 in sequence of moves
+        
+        slider_1.set(r3)
+        slider_2.set(b3)
+        slider_3.set(s3)
+        slider_4.set(c3)
 
- 
-        r1=300
-        b1=290
-        s1=269
-        c1=470
+        print ("Position 3",r3, b3, s3, c3)
 
-        slider_1.set(r1)
-        slider_2.set(b1)
-        slider_3.set(s1)
-        slider_4.set(c1)
-
-        print ("Position 3",r1, b1, s1, c1)
-
-        pwm.set_pwm(0, 0, r1)
-        pwm.set_pwm(1, 0, b1)
-        pwm.set_pwm(2, 0, s1)
-        pwm.set_pwm(3, 0, c1)
+        pwm.set_pwm(0, 0, r3)
+        pwm.set_pwm(1, 0, b3)
+        pwm.set_pwm(2, 0, s3)
+        pwm.set_pwm(3, 0, c3)
         
         time.sleep(2)
 
          #position 4 in sequence of moves
+        
+        slider_1.set(r4)
+        slider_2.set(b4)
+        slider_3.set(s4)
+        slider_4.set(c4)
 
- 
-        r1=300
-        b1=290
-        s1=269
-        c1=163
+        print ("Position ",r4, b4, s4, c4)
 
-        slider_1.set(r1)
-        slider_2.set(b1)
-        slider_3.set(s1)
-        slider_4.set(c1)
-
-        print ("Position 3",r1, b1, s1, c1)
-
-        pwm.set_pwm(0, 0, r1)
-        pwm.set_pwm(1, 0, b1)
-        pwm.set_pwm(2, 0, s1)
-        pwm.set_pwm(3, 0, c1)
+        pwm.set_pwm(0, 0, r4)
+        pwm.set_pwm(1, 0, b4)
+        pwm.set_pwm(2, 0, s4)
+        pwm.set_pwm(3, 0, c4)
         
         time.sleep(2)
 
 
-        
+#records a sequence
+def recordSequence():
+    label10= Label(mGui,text="Move sliders now").pack() #blank label to space things out a bit.
+    mbuttonA = Button(text="Record First postion",command = recordFirstValue, cursor="dotbox")
+    mbuttonA.pack()
+
+def recordFirstValue():
+    global r1; r1 = slider_1.get()
+    global b1; b1 = slider_2.get()
+    global s1; s1 = slider_3.get()
+    global c1; c1 = slider_4.get()
+
+    label11= Label(mGui,text=("Postion 1:", slider_1.get(), slider_2.get(), slider_3.get(), slider_4.get())).pack()
+    mbuttonA = Button(text="Record second position",command = recordSecondValue, cursor="dotbox")
+    mbuttonA.pack()
+
+def recordSecondValue():
+    global r2; r2 = slider_1.get()
+    global b2; b2 = slider_2.get()
+    global s2; s2= slider_3.get()
+    global c2; s2= slider_4.get()
+
+    label11= Label(mGui,text=("Postion 2:", slider_1.get(), slider_2.get(), slider_3.get(), slider_4.get())).pack()
+    mbuttonA = Button(text="Record third position",command = recordThirdValue, cursor="dotbox")
+    mbuttonA.pack()
+
+def recordThirdValue():
+    global r3; r3 = slider_1.get()
+    global b3; b3 = slider_2.get()
+    global s3; s3 = slider_3.get()
+    global c3; c3 = slider_4.get()
+
+    label11= Label(mGui,text=("Postion 3:", slider_1.get(), slider_2.get(), slider_3.get(), slider_4.get())).pack()
+    mbuttonA = Button(text="Record forth position",command = recordForthValue, cursor="dotbox")
+    mbuttonA.pack()
+
+def recordForthValue():
+    global r4; r4 = slider_1.get()
+    global b4; b4 = slider_2.get()
+    global s4; s4 = slider_3.get()
+    global c4; c4 = slider_4.get()
+
+    label11= Label(mGui,text=("Postion 4:", slider_1.get(), slider_2.get(), slider_3.get(), slider_4.get())).pack()
+
+
+#define variables
+
+r1=534
+b1=329
+s1=400
+c1=163
+
+r2=534
+b2=329
+s2=322
+c2=470
+
+r3=300
+b3=290
+s3=269
+c3=470
+
+r4=300
+b4=290
+s4=269
+c4=163
 
 mGui = Tk()  #starts TKinter. TKinter is what makes menus and buttons.
 
@@ -184,7 +230,7 @@ panel.pack(side = "top", fill = "both", expand = "no")
 """
 
 #Background and colour. You can set it to common colour names or hex codes.
-mGui.configure(background='orange')
+#mGui.configure(background='grey')
 
 
 
@@ -225,15 +271,22 @@ label8= Label(mGui,text="").pack() #blank label to space things out a bit.
 mbutton = Button(text="Move arm",command = outputs, cursor="dotbox")
 mbutton.pack()
 
+
+
+
+#button to reset arm to starting position
+label10= Label(mGui,text="").pack() #blank label to space things out a bit.
+mbutton = Button(text="Reset Arm Postion",command = resetArmPosition, cursor="dotbox")
+mbutton.pack()
+
+#button to record a program
+label10= Label(mGui,text="").pack() #blank label to space things out a bit.
+mbutton = Button(text="Record a program",command = recordSequence, cursor="dotbox")
+mbutton.pack()
+
 #button to run a sequemce of moves
 label9= Label(mGui,text="").pack() #blank label to space things out a bit.
 mbutton = Button(text="Run a sequence",command = runSequence, cursor="dotbox")
-mbutton.pack()
-
-
-#button to run a sequemce of moves
-label10= Label(mGui,text="").pack() #blank label to space things out a bit.
-mbutton = Button(text="Reset Arm Postion",command = resetArmPosition, cursor="dotbox")
 mbutton.pack()
 
 
