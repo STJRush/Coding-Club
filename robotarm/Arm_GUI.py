@@ -150,8 +150,8 @@ def recordFirstValue():
 def recordSecondValue():
     global r2; r2 = slider_1.get()
     global b2; b2 = slider_2.get()
-    global s2; s2= slider_3.get()
-    global c2; s2= slider_4.get()
+    global s2; s2 = slider_3.get()
+    global c2; c2 = slider_4.get()
 
     label11= Label(mGui,text=("Postion 2:", slider_1.get(), slider_2.get(), slider_3.get(), slider_4.get())).pack()
     mbuttonA = Button(text="Record third position",command = recordThirdValue, cursor="dotbox")
