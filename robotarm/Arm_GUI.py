@@ -1,6 +1,3 @@
-
-#This is the most useful code for moving the arm.
-
 from __future__ import division
 
 import sys
@@ -46,6 +43,114 @@ def outputs():
 
 
 
+def resetArmPosition(): 
+        print ("Reset arm position to ", 300, 300, 300, 300)
+        pwm.set_pwm(0, 0, 300)
+        pwm.set_pwm(1, 0, 300)
+        pwm.set_pwm(2, 0, 300)
+        pwm.set_pwm(3, 0, 300)
+
+        slider_1.set(300)
+        slider_2.set(300)
+        slider_3.set(300)
+        slider_4.set(300)
+        
+
+
+#outputs servo values to the shell then runs a sequence
+def runSequence(): 
+
+        print ("Starting Position", slider_1.get(), slider_2.get(), slider_3.get(), slider_4.get())
+
+        #position 1 in sequence of moves
+
+        r1=534
+        b1=329
+        s1=400
+        c1=163
+
+        slider_1.set(r1)
+        slider_2.set(b1)
+        slider_3.set(s1)
+        slider_4.set(c1)
+
+        print ("Position 1",r1, b1, s1, c1)
+
+        pwm.set_pwm(0, 0, r1)
+        pwm.set_pwm(1, 0, b1)
+        pwm.set_pwm(2, 0, s1)
+        pwm.set_pwm(3, 0, c1)
+        
+        time.sleep(2)
+
+        #position 2 in sequence of moves
+
+        r1=534
+        b1=329
+        s1=322
+        c1=470
+
+        slider_1.set(r1)
+        slider_2.set(b1)
+        slider_3.set(s1)
+        slider_4.set(c1)
+
+        print ("Position 1",r1, b1, s1, c1)
+
+        pwm.set_pwm(0, 0, r1)
+        pwm.set_pwm(1, 0, b1)
+        pwm.set_pwm(2, 0, s1)
+        pwm.set_pwm(3, 0, c1)
+        
+        time.sleep(2)
+
+
+        #position 3 in sequence of moves
+
+ 
+        r1=300
+        b1=290
+        s1=269
+        c1=470
+
+        slider_1.set(r1)
+        slider_2.set(b1)
+        slider_3.set(s1)
+        slider_4.set(c1)
+
+        print ("Position 3",r1, b1, s1, c1)
+
+        pwm.set_pwm(0, 0, r1)
+        pwm.set_pwm(1, 0, b1)
+        pwm.set_pwm(2, 0, s1)
+        pwm.set_pwm(3, 0, c1)
+        
+        time.sleep(2)
+
+         #position 4 in sequence of moves
+
+ 
+        r1=300
+        b1=290
+        s1=269
+        c1=163
+
+        slider_1.set(r1)
+        slider_2.set(b1)
+        slider_3.set(s1)
+        slider_4.set(c1)
+
+        print ("Position 3",r1, b1, s1, c1)
+
+        pwm.set_pwm(0, 0, r1)
+        pwm.set_pwm(1, 0, b1)
+        pwm.set_pwm(2, 0, s1)
+        pwm.set_pwm(3, 0, c1)
+        
+        time.sleep(2)
+
+
+        
 
 mGui = Tk()  #starts TKinter. TKinter is what makes menus and buttons.
 
@@ -120,6 +225,16 @@ label8= Label(mGui,text="").pack() #blank label to space things out a bit.
 mbutton = Button(text="Move arm",command = outputs, cursor="dotbox")
 mbutton.pack()
 
+#button to run a sequemce of moves
+label9= Label(mGui,text="").pack() #blank label to space things out a bit.
+mbutton = Button(text="Run a sequence",command = runSequence, cursor="dotbox")
+mbutton.pack()
+
+
+#button to run a sequemce of moves
+label10= Label(mGui,text="").pack() #blank label to space things out a bit.
+mbutton = Button(text="Reset Arm Postion",command = resetArmPosition, cursor="dotbox")
+mbutton.pack()
 
 
 #button to quit
@@ -161,6 +276,13 @@ pwm.set_pwm(2, 0, SMALLARM)
 pwm.set_pwm(3, 0, CLAW)  #200 is claw open xgz is claw closed
 
 #WARNING: Just because a servo can move to a position doesn't mean that the arm can do so without breaking.
+
+Notes on wiring of claw to servo. 
+
+1 orange to      black to   white
+2 red to         blue to    black
+3 brown to       green to   brown
+
 
 ###################################################
 
