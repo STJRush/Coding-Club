@@ -174,8 +174,51 @@ def recordForthValue():
     global c4; c4 = slider_4.get()
 
     label11= Label(mGui,text=("Postion 4:", slider_1.get(), slider_2.get(), slider_3.get(), slider_4.get())).pack()
+    label12= Label(mGui,text=("Sequence ready. Click Run Squence")).pack()
 
 
+    mbuttonA = Button(text="Save to file",command = saveSequenceToFile, cursor="dotbox")
+    mbuttonA.pack()
+
+def saveSequenceToFile():
+    f = open("armcode.txt", "wb") #opens or creates a text file to write the code to called armcode.txt
+    
+    f.write("First Position \n")
+    f.write( str(r1)+"\n")
+    f.write( str(b1)+"\n")
+    f.write( str(s1)+"\n")
+    f.write( str(c1)+"\n")
+
+    f.write("Second Position \n")
+    f.write( str(r2)+"\n")
+    f.write( str(b2)+"\n")
+    f.write( str(s2)+"\n")
+    f.write( str(c2)+"\n")
+
+    f.write("Third Position \n")
+    f.write( str(r3)+"\n")
+    f.write( str(b3)+"\n")
+    f.write( str(s3)+"\n")
+    f.write( str(c3)+"\n")
+
+    f.write("Forth Position \n")
+    f.write( str(r4)+"\n")
+    f.write( str(b4)+"\n")
+    f.write( str(s4)+"\n")
+    f.write( str(c4)+"\n")
+
+
+    
+
+
+
+    
+    f.close
+    
+    label12= Label(mGui,text=("File saved as: armcode")).pack()
+
+
+    
 #define variables
 
 r1=534
