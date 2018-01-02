@@ -3,6 +3,7 @@ from __future__ import division
 import sys
 import os
 from Tkinter import *
+from armcode import *
 
 #import PIL         """Pics are not wokring in 2.7 so this is blocked out"""
 #from Tkinter import messagebox
@@ -64,8 +65,6 @@ def runSequence():
         print ("Starting Position", slider_1.get(), slider_2.get(), slider_3.get(), slider_4.get())
 
         #position 1 in sequence of moves
-        
-
         
         slider_1.set(r1)
         slider_2.set(b1)
@@ -181,46 +180,42 @@ def recordForthValue():
     mbuttonA.pack()
 
 def saveSequenceToFile():
-    f = open("armcode.txt", "wb") #opens or creates a text file to write the code to called armcode.txt
+    f = open("armcode.py", "wb") #opens or creates a text file to write the code to called armcode.txt
     
-    f.write("First Position \n")
-    f.write( str(r1)+"\n")
-    f.write( str(b1)+"\n")
-    f.write( str(s1)+"\n")
-    f.write( str(c1)+"\n")
+    f.write("#First Position \n")
+    f.write( "r1="+str(r1)+"\n")
+    f.write( "b1="+str(b1)+"\n")
+    f.write( "s1="+str(s1)+"\n")
+    f.write( "c1="+str(c1)+"\n")
 
-    f.write("Second Position \n")
-    f.write( str(r2)+"\n")
-    f.write( str(b2)+"\n")
-    f.write( str(s2)+"\n")
-    f.write( str(c2)+"\n")
+    f.write("#Second Position \n")
+    f.write( "r2="+str(r2)+"\n")
+    f.write( "b2="+str(b2)+"\n")
+    f.write( "s2="+str(s2)+"\n")
+    f.write( "c2="+str(c2)+"\n")
 
-    f.write("Third Position \n")
-    f.write( str(r3)+"\n")
-    f.write( str(b3)+"\n")
-    f.write( str(s3)+"\n")
-    f.write( str(c3)+"\n")
+    f.write("#Third Position \n")
+    f.write( "r3="+str(r3)+"\n")
+    f.write( "b3="+str(b3)+"\n")
+    f.write( "s3="+str(s3)+"\n")
+    f.write( "c3="+str(c3)+"\n")
 
-    f.write("Forth Position \n")
-    f.write( str(r4)+"\n")
-    f.write( str(b4)+"\n")
-    f.write( str(s4)+"\n")
-    f.write( str(c4)+"\n")
+    f.write("#Forth Position \n")
+    f.write( "r4="+str(r4)+"\n")
+    f.write( "b4="+str(b4)+"\n")
+    f.write( "s4="+str(s4)+"\n")
+    f.write( "c4="+str(c4)+"\n")
 
-
-    
-
-
-
-    
     f.close
     
     label12= Label(mGui,text=("File saved as: armcode")).pack()
 
+def exitProgram():
+    quit()
 
     
 #define variables
-
+"""
 r1=534
 b1=329
 s1=400
@@ -240,7 +235,7 @@ r4=300
 b4=290
 s4=269
 c4=163
-
+"""
 mGui = Tk()  #starts TKinter. TKinter is what makes menus and buttons.
 
 
@@ -324,18 +319,18 @@ mbutton.pack()
 
 #button to record a program
 label10= Label(mGui,text="").pack() #blank label to space things out a bit.
-mbutton = Button(text="Record a program",command = recordSequence, cursor="dotbox")
+mbutton = Button(text="Record a sequence",command = recordSequence, cursor="dotbox")
 mbutton.pack()
 
 #button to run a sequemce of moves
 label9= Label(mGui,text="").pack() #blank label to space things out a bit.
-mbutton = Button(text="Run a sequence",command = runSequence, cursor="dotbox")
+mbutton = Button(text="Run saved sequence",command = runSequence, cursor="dotbox")
 mbutton.pack()
 
 
 #button to quit
 label9= Label(mGui,text="").pack()
-mbutton2 = Button(text="Exit",command = sys.exit, cursor="pirate")
+mbutton2 = Button(text="Exit",command = exitProgram, cursor="pirate")
 mbutton2.pack()
 
 mGui.mainloop()
