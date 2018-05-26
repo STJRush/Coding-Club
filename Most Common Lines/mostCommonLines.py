@@ -79,7 +79,7 @@ finalList=[]  #prepares an empty list to print the matching lines into later
 #It might help to imaging "n" as your left finger keeping track of the row and "z" as your right finger going across the columns
 
 n=0
-while n<totalNumberOfLines//2:  #no point in comparing past the number of lines in the doc!
+while n<totalNumberOfLines:  #no point in comparing past the number of lines in the doc!
     z=1
     while z<totalNumberOfLines:            
             try:
