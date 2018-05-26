@@ -22,21 +22,19 @@ bookFile.close() #python has the string in it's head now, so can close the text 
 #clean up the file and put each sentence on a new line
 
 clean_string= re.sub("\n", " ", string)    #join it all back up into one long long line.
-clean_string= re.sub("\n", " ", clean_string)
 
 clean_string= re.sub("\.\.\.\.\.\.", "", clean_string)
 clean_string= re.sub("\.\.\.\.\.", "", clean_string)
-clean_string= re.sub("\.\.\.\.\.", "", clean_string)
+clean_string= re.sub("\.\.\.\.\.", "", clean_string)     #get rid of ....
 clean_string= re.sub("\.\.\.\.", "", clean_string)
 clean_string= re.sub("\.\.\.", "", clean_string)
 clean_string= re.sub("\.\.", "", clean_string)
 
 clean_string= re.sub("\. \. \. \.", "", clean_string)
-clean_string= re.sub("\. \. \.", "", clean_string)
+clean_string= re.sub("\. \. \.", "", clean_string)      #get rid of . . . . . 
 clean_string= re.sub("\. \.", "", clean_string)
+
 clean_string= re.sub("\.", "\n", clean_string)
-
-
 clean_string= re.sub("\?", "\n", clean_string)    #make these all markers for new lines
 clean_string= re.sub("\!", "\n", clean_string)
 
@@ -75,10 +73,12 @@ if totalNumberOfLines>3000:
 print("Okay, here we go")
 print("========================================================")
 
-#The bit below makes takes a line (n) and compares it to all other lines (z)
-n=0
-finalList=[]
+finalList=[]  #prepares an empty list to print the matching lines into later
 
+#The bit below makes takes a line (n) and compares it to all lines after it (z)
+#It might help to imaging "n" as your left finger keeping track of the row and "z" as your right finger going across the columns
+
+n=0
 while n<totalNumberOfLines//2:  #no point in comparing past the number of lines in the doc!
     z=1
     while z<totalNumberOfLines:            
