@@ -1,0 +1,41 @@
+
+sudo apt-get update
+sudo apt-get upgrade
+
+
+
+sudo pip3 install opencv-python
+sudo apt-get install libatlas-base-dev
+sudo apt-get install libjasper-dev
+sudo apt-get install libqtgui4
+sudo apt-get install python3-pyqt5
+sudo apt-get install libqt4-test
+
+
+This almost works but there's one more error on 
+the current pip version of opencv:
+
+
+ERROR: opencv: undefined symbol: __atomic_fetch_add_8
+
+
+
+Follow the fix here:
+
+https://github.com/piwheels/packages/issues/59
+
+Which is basically, you have to open the file in the terminal.
+And do it in a weird way.
+
+Instead of going like normal, using cd and ls to naviagate to 
+your file and opening it with
+
+sudo python3 yourFileNameWhatever.py
+
+you need to add in a 
+
+LD_PRELOAD=/usr/lib/arm-linux-gnueabihf/libatomic.so.1 python3
+
+so it would be
+
+sudo LD_PRELOAD=/usr/lib/arm-linux-gnueabihf/libatomic.so.1 python3 yourFileNameWhatever.py
