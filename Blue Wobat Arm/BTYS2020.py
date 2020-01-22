@@ -3,6 +3,12 @@ from PCA9685 import PCA9685
 from time import ctime
 import random
 import os
+import RPi.GPIO as GPIO
+
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(2, GPIO.OUT)
+
+GPIO.output(2, GPIO.LOW)
 
 
 print("start")
@@ -66,8 +72,11 @@ def mainMenu():
             
         elif choice == "2":
             print("Shooting water")
+            GPIO.output(2, GPIO.HIGH)
             os.system('mplayer target.wav')
             os.system('mplayer alarm.wav')
+            time.sleep(1)
+            GPIO.output(2, GPIO.LOW)
             
             
         elif choice == "3":
@@ -75,6 +84,7 @@ def mainMenu():
             pwm.setServoPulse(0,1500) #return to start position
             os.system('mplayer shutdown.wav')
             os.system('mplayer goodnight.wav')
+            GPIO.cleanup()
             return 0
             break
 
@@ -131,8 +141,9 @@ pwm.setServoPulse(0,2600)
 
 time.sleep(1)
 
-#gpio.cleanup()
+
 
 print("done")
 
-            #EGG
+            
+
