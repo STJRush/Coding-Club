@@ -1,3 +1,6 @@
+
+#pings a bunch of switches or whatever to see if the internet is working. The command line was sad so I added some colour.
+
 from ping3 import ping, verbose_ping
 
 from colorama import init
