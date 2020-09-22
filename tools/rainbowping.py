@@ -1,6 +1,9 @@
 
 #pings a bunch of switches or whatever to see if the internet is working. The command line was sad so I added some colour.
 
+pingTargets = ["192.168.8.100", "192.168.8.105", "192.168.8.125"]
+
+
 from ping3 import ping, verbose_ping
 from pygame import mixer
 from time import sleep
@@ -51,10 +54,31 @@ print("                        |__>            || ||      || ||          ")
 print("")
 print("")
 sleep(3)
-pingTargets = ["192.168.8.100", "192.168.8.105", "192.168.8.125"]
 
-print(pingTargets[0])
 
+print("This program will ping these targets:")
+print(pingTargets)
+print("You can add to the list of targets by editing the first line of this .py file in notepad")
+print(Fore.BLACK + Back.GREEN + "Nice nature sounds means good network weather")
+sleep(2)
+mixer.music.stop()
+mixer.music.load("drizzle.mp3")
+mixer.music.play()
+print(Fore.BLACK + Back.YELLOW + "Drizzle will start if things slow down")
+sleep(2)
+print(Fore.BLACK + Back.RED + "Then rain if it gets quite slow")
+mixer.music.stop()
+mixer.music.load("rain.mp3")
+mixer.music.play()
+sleep(2)
+print(Fore.WHITE + Back.RED + "Then a storm if things go to !&££$!")
+mixer.music.stop()
+mixer.music.load("jaziswind.mp3")
+mixer.music.play()
+sleep(2)
+
+print("The colour will change too if things get bad.")
+print("The idea is that you don't have to keep looking at the screen to know how the network is doing")
 
 try:
 
