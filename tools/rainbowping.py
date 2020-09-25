@@ -12,7 +12,7 @@ from colorama import init
 init()
 from colorama import Fore, Back, Style
 
-severityLevel = 0 
+severityLevel = 10
 
 # Starting the mixer
 mixer.init()
@@ -77,6 +77,7 @@ mixer.music.stop()
 mixer.music.load("jaziswind.mp3")
 mixer.music.play()
 sleep(2)
+mixer.music.stop()
 
 print("The colour will change too if things get bad.")
 print("The idea is that you don't have to keep looking at the screen to know how the network is doing")
@@ -111,8 +112,9 @@ try:
                 if snapshot < 10:
                     print(Fore.BLACK + Back.GREEN + "We're all good")
                     
-                    if severityLevel == 0:
+                    if severityLevel != 0:
                     
+                        print("Everyone take a breather")
                         mixer.music.stop()
                         mixer.music.load("birds.mp3")
                         mixer.music.play()
@@ -125,7 +127,7 @@ try:
                 elif snapshot > 10 and snapshot < 100:
                     print(Fore.BLACK + Back.YELLOW + "Could be better")
                     
-                    if severityLevel == 1:
+                    if severityLevel != 1:
                     
                         mixer.music.stop()
                         mixer.music.load("drizzle.mp3")
@@ -138,7 +140,7 @@ try:
                 elif snapshot > 100 and snapshot < 500:
                     print(Fore.BLACK + Back.RED + "Not great, not terrible")
                    
-                    if severityLevel == 2:
+                    if severityLevel != 2:
                     
                         mixer.music.stop()
                         mixer.music.load("rain.mp3")
