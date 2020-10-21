@@ -1,24 +1,8 @@
-#starts pygame
-from time import sleep
-import pygame
-pygame.init()
-
-#sets the window size
-gameDisplay = pygame.display.set_mode((800,600))
-
-#loads in your pics to use later
-pokeScreen1 = pygame.image.load('village.PNG')
-garyImg = pygame.image.load('ash.png')
-
-#SET BACKGROUND COLOUR
-gameDisplay.fill((0,0,0)) # paints black
-
-
 
 def tesco():
     
     while True:
-        
+       
         choice = input("where do you want to go? (s)upervalu")
         
         if choice == "s":
@@ -30,7 +14,7 @@ def tesco():
 
 
 def supervalu():
-    
+    print("In your bag:", listy)
     
     while True:
         
@@ -52,26 +36,70 @@ def supervalu():
 def village():
     print("You're standing at the T junction by the butchers. It's the village takeaway!")
     
+    print("Two seaguls step out into your path and thow you a filty look like a flying howyaz")
+    print("One goes for your phone")
     
-#DISPLAY PICS
-
-gameDisplay.blit(pokeScreen1, (80,80))
- #puts pokemon background at 
-
-for i in range (0, 500, 5):
-    gameDisplay.blit(garyImg, (i,90)) #puts car at 70,90 on top of last picture.
-    pygame.display.update()
-    sleep(0.01)
+    birdhealth  = 10
+    playerHealth = 10
     
-
-#if you add a pic, you need to update the screen to show it
-pygame.display.update()
-
-
-
-
-
-#Escape from Tesco Car Park
+   
+    
+    while birdhealth>0:
+        
+        print(" \n\n    ")
+        print("      ███████████")
+        print("  ███████ █ █ ████  ")
+        print("     █████████████                       ")
+        print("      ██  \       ██                        ")
+        print("████████ ██       ██                        ")
+        print("██░░░░██          ██                        ")
+        print("████████          ██                        ")
+        print("      ████      ████                        ")
+        print("        ██      ██                          ")
+        print("      ████      ████                         ")
+        print("        ███    ███                          ")
+        print("        ██ █  ███                           ")
+        print("        ██  ██  ██                          ")
+        print("      ████      ████████████████████████████ ")
+        print("      ██             ██░░░░░░░░░░░░░░░░░░░░██ ")
+        print("      ██  [    ]     ██░░░░░░addidas░░ ░ ░ ░██ ")
+        print("      ██   [  ]      ██░░░░░░░░░░░░░░░░░░░░██ ")
+        print("      ██             ████████████████████████ ")
+        print("      ██                                  ██ ")
+        print("      ██████████████████████████████████████ ")
+        print("        ██░░██  ██░░██                   ")   
+        print("        ██░░██  ██░░██           ")           
+        print("        ██░░██  ██░░██       ")               
+        print("    ██████░░██████░░██         ")             
+        print("    ██ ░ ░ ░██ ░ ░ ░██       ")               
+        print("    ██████████████████   \n\n  ")
+        
+                  
+        print("Bird health:", birdhealth)
+        print("Your health:", playerHealth)
+        
+        action = input("Do you (s)mack it or (r)un?")
+        
+        if action == "s":
+            print(namey, " commits an act of animal cruelty")
+            birdhealth = birdhealth - 5
+               
+        elif action == "r":
+            print("You can't escape a seagul! It hits you!")
+            playerHealth = playerHealth - 1
+            
+        if playerHealth == 0:
+            raise ImaJustGonaCrashPythonYoureThatBad
+            
+    
+    print("\n The bird is gone. Val comes out and gives you a some breaded chicken")
+    
+    listy.append("breaded chicken")
+    print("In your bag:", listy)
+    
+    
+    
+listy = []     
 
 #NAME                    
 print("You see a Tesco Security guard approach you")
@@ -86,13 +114,3 @@ tesco()
 
     
 print("game over")
-
-
-
-
-
-#This line just stops the game from closing at the end
-input("Finished game, press the anykey")
-
-pygame.quit()
-quit()
