@@ -12,19 +12,10 @@ def d(n): #rolls a dice eg d(8) or d(20)
 
 #quick toggles
 sneakAttackToggle=True #assuming sneak attacks
-adv=False #assuming advantage
-debug=False #set to True for narration
+adv=False
+debug=False
 
-###############################################
-# Change These Stats for Different Characters #
-###############################################
-characterLevel=3
-profBonus=3
-dexModifier=3
-strengthModifier=1
-###############################################
-
-atkbonus = dexModifier + profBonus #weapon or spell attack bonus
+atkbonus=6 #weapon or spell attack bonus
 
 #parameters
 simCount=9000
@@ -62,7 +53,6 @@ print("This program also has a debug mode to narrate a single action.")
 print("It also takes into account Critical Hits ie. Rolling a 20 \n \n")
 
 print("0-13 No Armour    15-17 Medium Amour   18+ Heavy Armour \n")
-
 aC=int(input("Please enter the Armour Class of your opponent eg. 22  "))
 
 print("If your oppenant is on the ground or flanked, you have advantage.")
@@ -74,96 +64,71 @@ if debug==True:
 
 for x in range(simCount): #how many attacks to simulate
 
-  # weapons for characters
+  #weapons for this character
+  shortsword = d(6)+3
+  rapier = d(8)+3
 
-  #dex weapons (default)
-  shortsword = d(6)+dexModifier
-  rapier = d(8)+dexModifier
-  heavyCrossbow = 1*d(10)+dexModifier
-  longbow = 1*d(8)+dexModifier
-  shortbow = 1*d(6)+dexModifier
-  scimitar= 1*d(6)+dexModifier
+  #sneak attack
+  if sneakAttackToggle==True:
+    sneakAttack = 2*d(6)
+  else:
+    sneakAttack= 0 
 
-  #strength weapons (change attack bonus)
-  longsword = 1*d(8)+strengthModifier
-  spear = 1*d(6)+strengthModifier
-
-  #special modifiers
-  sneakAttack = 2*d(6)
-  
-  ###############################################
-  # Change These Stats for Different Characters #
-  ###############################################
-
-  #Weapons equiped for each attack
-  #The A,B and C parts of the weapon attacks allow for smites, extra damage rolls, sneak attacks etc.
-
-  weapon1A=rapier
-  weapon1B=sneakAttack
-  weapon1C=0
-
-  weapon2A=shortsword
-  weapon2B=0
-  weapon2C=0
-
-  weaponBonusActionA=0
-  weaponBonusActionB=0
-  weaponBonusActionC=0
-
-  ###############################################
-  
   #1st attack damage comes from
-  atk1Dmg = weapon1A + weapon1B + weapon1C
+  atk1Dmg = rapier + sneakAttack
 
   #2nd attack damage comes from
-  atk2Dmg = weapon2A + weapon2B +weapon2C
+  atk2Dmg = shortsword
 
-  bonusActionDmg = weaponBonusActionA + weaponBonusActionB + weaponBonusActionC
   #Bonus attack damage comes from
   #Not setup for this character yet
     
-  atk1DiceRoll=d(20)
+  atk1=d(20)
   if debug==True:
-    print("You swing your blade down from the heavens above!")
+    print("You swing your sun blade down from the heavens above!")
     print("Rolling a d20 dice to attack..")
     sleep(simSpeed)
-    print("You roll a ", atk1DiceRoll)
+    print("You roll a ", atk1)
     sleep(simSpeed)
 
 
-  atkRoll1=atk1DiceRoll+atkbonus   #add your attack bonus to your roll
+  atk1=atk1+atkbonus   #add your attack bonus to your roll
 
   if debug==True:
-    print("A level Rogue 3 / Fighter 2  has an attack bonus of +",atkbonus,", so in total that's a ", atkRoll1, "to hit." )
+    print("A level Rogue 3 / Fighter 2  has an attack bonus of +",atkbonus,", so in total that's a ", atk1, "to hit." )
     sleep(simSpeed)
 
   if adv==True: #check for advantage
-      advantagedAttackroll=d(20)+atkbonus #roll again
-      if advantagedAttackroll >=atkRoll1:
-        atkRoll1=advantagedAttackroll  #take higher roll
+      atkadv=d(20)+atkbonus #roll again
+      if atkadv >=atk1:
+        atk1=atkadv  #take higher roll
 
         if debug==True:
-          print("Oh wait!.. With advantage you roll again and take the higher roll of", atkRoll1)
+          print("Oh wait!.. With advantage you roll again and take the higher roll of", atkadv-atkbonus)
           sleep(simSpeed)
 
 
         
 
-  if atkRoll1>=aC:  #check if it hits
+  if atk1>=aC:  #check if it hits
 
     if debug==True:
-          print("So an attack of ", atkRoll1, " to hit an AC of", aC)
+          print("So an attack of ", atk1, " to hit an AC of", aC)
           sleep(simSpeed)
           print("That's a hit!")
           print("Your strike lands home! Your opponent does not look happy!")
           sleep(simSpeed)
     
 
+    
+    
+    
+
     if debug==True:
           print("Your first attack does damage of ", atk1Dmg)
           sleep(simSpeed)
 
-    if atk1DiceRoll==20:
+    if (atk1-atkbonus)==20:
     
       if debug==True:
             print("FIRST ATTACK IS A CRITICAL HIT!!!")
@@ -171,15 +136,21 @@ for x in range(simCount): #how many attacks to simulate
             print("Damage of ", atk1Dmg, " is doubled!!!!")
             sleep(simSpeed)
 
-      atk1Dmg=atk1Dmg*2  #CRITICAL HIT, DOUBLE IT UP!
+      atk1Dmg=atk1Dmg*2  #CRITICAL HIT
 
       if debug==True:
             print("First attack does a damage of ",atk1Dmg)
 
-
+      
+    
+    
+    
   else:
-    atk1Dmg=0 # you miss so no damage for you
-  
+
+      
+    atk1Dmg=0 
+              
+              
     if debug==True:
             print("FIRST ATTACK IS A MISS!")
             print("Your strike rattles off the opponent's armour!")
@@ -224,8 +195,15 @@ for x in range(simCount): #how many attacks to simulate
           sleep(simSpeed)
           print("That's a hit!")
           sleep(simSpeed)
+    
+    
+    
+    
+    
+    #print("First attack hits with ", atk1Dmg)
 
-    if (atk2-atkbonus)==20: #Natural 20
+    if (atk2-atkbonus)==20:
+      
 
       if debug==True:
             print("SECOND ATTACK IS A CRITICAL HIT!!!")
@@ -238,23 +216,21 @@ for x in range(simCount): #how many attacks to simulate
             print("offhand attack damge is ", atk2Dmg)
             sleep(simSpeed)
             
+    
   else:
 
-    atk2Dmg=0 
-
+      #print("First attack misses!")
+    atk2Dmg=0 #the +1 is because matplot draws ugly lines for 0. So 1 is no hit.
     if debug==True:
             print("OFFHAND ATTACK IS A MISS!")
             print("Your opponent steps under your swing and takes no damage.")
             sleep(simSpeed)
+    
 
-
-
-#BONUS ACTION DAMAGE:
-  bonusActionDmg = 0
 
 
 #ADD IT ALL UP
-  dmg= atk1Dmg + atk2Dmg + bonusActionDmg #the plus one here is a bug fix for red lines showing up
+  dmg=atk1Dmg+atk2Dmg #the plus one here is a bug fix for red lines showing up
                                  # in matplot graphs. It's silly.
 
   dmglist.append(dmg)

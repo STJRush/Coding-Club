@@ -11,8 +11,7 @@
 from pygame import mixer 
 from time import sleep
 mixer.init() 
-  
-  
+
 # Part 1/3: HOW TO PLAY MUSIC  --------------------------------
  
 # 1. Load the song. (Music files should be .mp3 files)
