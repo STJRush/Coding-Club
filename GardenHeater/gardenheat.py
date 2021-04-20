@@ -1,5 +1,5 @@
 # This is for a mini greenhouse so that I can put indoor plants outside.
-# An RPi controls a little heater with thorugh a relay. 
+# An RPi controls a little heater through a relay. 
 # This warms things up on frosty nights. 
 # It also has a fan that turns on if it gets too hot.
 # A sensor monitors and logs temperature to a csv file so that I can fine tune things.
