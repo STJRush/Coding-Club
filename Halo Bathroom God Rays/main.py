@@ -1,23 +1,44 @@
+import bme280
+import smbus2
+import smbus
+import sys
+import os
+from datetime import datetime, timedelta
+from apds9960.const import *
+from apds9960 import APDS9960
 
 from pygame import mixer 
 from time import sleep
 mixer.init()
 
 import RPi.GPIO as GPIO  
-GPIO.setmode(GPIO.BCM)     # set up BCM GPIO numbering  
-GPIO.setup(4, GPIO.IN)    # set GPIO4 as input (light sensor)  
+GPIO.setmode(GPIO.BCM)     # set up BCM GPIO numbering   
 GPIO.setup(17, GPIO.OUT)   # set GPIO17 as an output (LED)  
 
 import Adafruit_DHT as DHT
+port = 1
 
-#choose music
-mixer.music.load("halo_choir.mp3") # This .mp3 needs to be in the same folder as your .py python file
-mixer.music.set_volume(0) 
 
-music_playing_flag = False
+#light stuff
+bus2 = smbus.SMBus(port)
+apds = APDS9960(bus2)
+
+address = 0x77 # Adafruit BME280 address. Other BME280s may be different
+bus = smbus2.SMBus(port)
+
+
+apds.enableLightSensor()
+
+
+def readLight():
+    lighting = apds.readAmbientLight()
+    print("Light: " , lighting)
+    sleep(1)
+    return lighting
+
 
 def get_humidity():
-    humid, temp = DHT.read_retry(DHT.DHT11, 3)
+    humid, temp = DHT.read_retry(DHT.DHT11, 4)
     print(temp, humid)
     
     return humid
@@ -46,16 +67,19 @@ def fade_out_music():
         
     mixer.music.stop()
 
+
+#choose music
+mixer.music.load("halo_choir.mp3") # This .mp3 needs to be in the same folder as your .py python file
+mixer.music.set_volume(0) 
+
+music_playing_flag = False
+
 print("The current humidity is ", get_humidity())
-
-
-
-#fade_in_music()
-#fade_out_musicy()
-#fade_out_music()
-# idea: maybe link the light level to volume?
+print("The current light is is ", readLight())
 
 checkHumidityOnlyEvery10Times = 0
+
+
 
 try:  
     while True:            # This will carry on until you hit CTRL+C
@@ -67,13 +91,13 @@ try:
          if checkHumidityOnlyEvery10Times % 10 == 0:
              
              # Check the humidity is nice and high
-             if get_humidity() > 60:   
+             if get_humidity() > 50:
                 
                 # reset the humidty counter from 10 back to 0
                 checkHumidityOnlyEvery10Times = 0
                 
                 # Check the light sensor on GPIO 4. "0" means light detected.
-                if GPIO.input(4) == 0:
+                if readLight() > 1000:
                     print("SunLight Detected, playing music.")
                     
                     # Only fade in if not already playing
