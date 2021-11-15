@@ -1,10 +1,17 @@
-import Adafruit_DHT as DHT
-from firebase import firebase
+import Adafruit_DHT as DHT #sudo pip3 install Adafruit_DHT
+from firebase import firebase #sudo pip3 install python-firebase
 import csv
 import requests, json
 import time
 import random
 from time import sleep
+from datetime import datetime
+
+roomNumber = 5
+
+# for startup code:
+# sudo nano /etc/rc.local
+# sudo python3/home/pi/r5.py &
 
 def getOutSideTemp():
     api_key = "a19c355c905cbcb821b784d45a9cb1de"
@@ -95,12 +102,14 @@ def writeTempToCSV(temperatureForCSV):
 
 #check difference
 ########################################################
+while True:
     
+    # roomNumber = input("Type in your Room Number")
 
-roomNumber = input("Type in your Room Number")
-debugmodey = (input("Debug? Y/N")).lower()
-
-if debugmodey is not "y":
+    #gets the times and dates now
+    now = datetime.now()
+    timeNow = now.strftime("%H:%M:%S") 
+    dateNow = now.strftime("%d:%m:%Y") 
 
     localTempReading = readLocalTemp()
     outsideTempDownload = getOutSideTemp()
@@ -110,17 +119,12 @@ if debugmodey is not "y":
 
     # write data to csv
     writeTempToCSV(tempDifference)
-    
-else:
-    print("Setting Simulated Values")
-    localTempReading = 20.69
-    outsideTempDownload = 14.20
 
+    firebase = firebase.FirebaseApplication('https://rpitempdata.firebaseio.com/', None)
+        # attatches names to the data
+    data = {"TempDifference": tempDifference, "LocalTemp": localTempReading,"OutsideTemp": outsideTempDownload, "TimeStamp": timeNow , "DateStamp": dateNow   }
+        
+        #POSTS  to the database (POST means create an entry, does generate a nasty long node name)
+    firebase.post('/R'+str(roomNumber), data)
 
-firebase = firebase.FirebaseApplication('https://rpitempdata.firebaseio.com/', None)
-    # attatches names to the data
-data = {"TempDifference": tempDifference, "LocalTemp": localTempReading,"OutsideTemp": outsideTempDownload  }
-    
-    #POSTS  to the database (POST means create an entry, does generate a nasty long node name)
-firebase.post('/R'+roomNumber, data)
-
+    sleep(300)
