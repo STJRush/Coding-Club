@@ -1,16 +1,50 @@
 
 #pings a bunch of switches or whatever to see if the internet is working. The command line was sad so I added some colour.
 
-pingTargets = ["10.1.199.09","10.1.199.10","10.1.199.11", "10.1.199.12", "10.1.199.13", "10.1.199.14"]
+pingTargets = ["10.1.199.09","10.1.199.10","10.1.199.11", "10.1.199.12", "10.1.199.13", "10.1.199.14","10.1.199.15"]
 
+#thingspeak
+import sys
+from urllib.request import urlopen
 
+#pinger
 from ping3 import ping, verbose_ping
+
+import speedtest
+
+#sound and colour
 from pygame import mixer
 from time import sleep
 import colorama
 from colorama import init
 init()
 from colorama import Fore, Back, Style
+
+
+
+myAPI = "TKFZ8ENTJ1DPQ3A7"  #your key from your own thingspeak account. Put yours here
+
+
+def updateThingSpeak(): 
+   print('starting...') 
+   baseURL = 'https://api.thingspeak.com/update?api_key=%s' % myAPI  
+
+   
+   try: 
+       
+       f = urlopen(baseURL + "&field1=%s" % (externalSpeedTestResult)) 
+       print ("Sent, thanks!", f.read()) 
+       f.close()
+   except: 
+       print('exiting.') 
+       
+
+
+
+
+
+
+st = speedtest.Speedtest()
 
 severityLevel = 10
 
@@ -19,9 +53,10 @@ mixer.init()
 
 # Loading the songs and sounds
 mixer.music.load("birds.mp3")
-#crash_sound = mixer.Sound("crash.mp3")
-#soundy = mixer.Sound("malf.wav")
-#mixer.Sound.play(soundy)
+crashSound = mixer.Sound("crashWav.wav")
+malfSound = mixer.Sound("malfWav.wav")
+thunderSound = mixer.Sound("thunderCrashWav.wav")
+mixer.Sound.play(malfSound)
 
 # Setting the volume
 mixer.music.set_volume(0.7)
@@ -97,7 +132,7 @@ try:
 
             if ping(ip) == None:
                 print(Fore.RED + Back.BLACK + "WARNING! ENTIRE SWITCH IS DOWN!")
-                #mixer.Sound.play(malf_sound)
+                mixer.Sound.play(malfSound)
                 print(Style.RESET_ALL)
 
             else:
@@ -164,7 +199,7 @@ try:
                     print("ALARM ALARM")
                     print(Fore.WHITE + Back.RED + "IT'S HAPPENING AGAIN!")
                     print(Fore.WHITE + Back.RED + "RUN FOR YOUR LIVES!")
-                    #mixer.Sound.play(crash_sound)
+                    mixer.Sound.play(crashSound)
                     
                     
 
@@ -172,9 +207,14 @@ try:
                 else:
                     print("WHAT KINDA PING IS THAT?")
 
-                print("Ping is about ", snapshot)
+                print("Ping is about ", round(snapshot))
 
                 print(Style.RESET_ALL)
+                
+        externalSpeedTestResult= (round(st.download()/1000000))
+        print("The external download speed is..", externalSpeedTestResult, "Mb/s")
+        
+        updateThingSpeak()
 
 except KeyboardInterrupt:
     print(Style.RESET_ALL)
