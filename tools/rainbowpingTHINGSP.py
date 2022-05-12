@@ -29,7 +29,8 @@ def updateThingSpeak():
    
    try: 
        
-       f = urlopen(baseURL + "&field1=%s" % (snapshot)) 
+       f = urlopen(baseURL + "&field1=%s" % (snapshot))
+       print("Sending last ping value to graph on thingspeak. Lower value is better.")
        print (f.read()) 
        f.close() 
        sleep(10) #uploads sensor values every 5 minutes 
