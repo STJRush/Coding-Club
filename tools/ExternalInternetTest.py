@@ -1,4 +1,5 @@
 # Python program to test
+# import speedtest-cli and not speedtest
 from pygame import mixer # For sound effects
 from time import sleep
 
@@ -11,7 +12,7 @@ import statistics
 
 swanLakePlayingFlag = False
 while True:
-    try:
+
         st = speedtest.Speedtest()
         
         listOfTestSpeeds=[]
@@ -35,8 +36,8 @@ while True:
             print("WTF")
         print("")
         swanLakePlayingFlag = False
-        
-    except:
+        mixer.music.stop()
+
         print("Internet is completely down")
         
         if swanLakePlayingFlag is False:
