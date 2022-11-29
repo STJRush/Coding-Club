@@ -20,5 +20,12 @@ White - C   Data
 Green - D   Data
 
 
+Rough instructions:
+
+Disconnect the mouse's internal Infrared LED from the mouse and hook it up to GPIO17 and GND instead so that the pico can control if the mouse actually works or not depending on the mood of the mouse. Make not of positive and neg before disconnecting.
+
+Pull back the insulation on the +5V and GND wires to the mouse. Solder 2 wires off of them to steal their power. You can use that to power your pico and the speaker. 
+
+
 
 
