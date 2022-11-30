@@ -28,4 +28,4 @@ Pull back the insulation on the +5V and GND wires to the mouse. Solder 2 wires o
 
 
 
-
+Should investigate PWM sound output to ditch the bulky relay. Or find a smaller relay. 
