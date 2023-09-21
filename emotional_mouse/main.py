@@ -1,4 +1,14 @@
 # An emotional mouse code
+
+"""
+## To Do:
+- Replace Pin 15 Digital sensor with Analogue. 
+- Clean up the complete mess of wires
+- Make a sock/mouse cover
+- Think of ways of calming down the mouse.
+
+"""
+
 from machine import Pin
 import time
 
@@ -110,15 +120,16 @@ WiFi Chip Facing You
 [           ]
 [           ]
 [           ]
-[ VBUS  0   ]          
+[ VBUS  0   ]
+
 [ VSYS  1   ] 
 [ GND  GND  ]       <----   GND is 3rd pin down from top right near USB
 [ 3V3   2   ]
 [ 3v3   3   ] 
 [ RED   4   ] 
 [ 28    5   ] (ADC2) is GP28
-[ GND  GND  ] (AGND)
-[ 27    6   ] (ADC1) is GP27
+[ GND  GND  ] (AGND)                  <----   Test Button GND 
+[ 27    6   ] (ADC1) is GP27          <----   GP6 is the Test Button 
 [ 26    7   ] (ADC0) is GP26
 [ RUN   8   ]
 [ 22    9   ]
