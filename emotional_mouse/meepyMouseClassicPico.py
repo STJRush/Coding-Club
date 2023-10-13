@@ -1,14 +1,4 @@
 # An emotional mouse code
-
-"""
-## To Do:
-- Replace Pin 15 Digital sensor with Analogue. 
-- Clean up the complete mess of wires
-- Make a sock/mouse cover
-- Think of ways of calming down the mouse.
-
-"""
-
 from machine import Pin
 import time
 
