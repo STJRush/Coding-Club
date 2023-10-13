@@ -1,4 +1,5 @@
-## Emotional Mouse Project
+
+## Current Project: Emotional Mouse Project
 
 This is a computer mouse that makes an cute/angry noise if you're too rought with it. It gets stressed out. Starts shaking the cursor.
 Then you have to pick it up and calm it down. 
