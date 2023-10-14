@@ -2,6 +2,10 @@
 from machine import Pin
 import time
 
+
+
+frightened_mouse_state = False
+
 # sets up internal LED, comment out whatever model pico you don't have
 
 # internal led code for original pico
@@ -22,6 +26,7 @@ button = Pin(6, Pin.IN, Pin.PULL_UP)
 
 # initialize counter for later
 i=0
+c=0
 
 print("Starting..")
 
@@ -35,20 +40,39 @@ mouseLEDPin17.on()
 while True:
     
     # if we see an input signal on Pin15...
-    if pinIn15.value(): 
-        # interalLED.on() # turn on the interal LED (debugging)
-        print("We get signal")
+    if pinIn15.value():
+        
+        print("Mouse got a fright")
         soundPin16.on() # turns on output Pin16 to trigger relay-> soundboard
         
-        # turn off/on the mouse for a bit to punish user for being too rough
-        mouseLEDPin17.off()
-        time.sleep(0.5)
-        mouseLEDPin17.on()
-        time.sleep(1)
-        mouseLEDPin17.off()
-        time.sleep(1)
-        mouseLEDPin17.on()
+        # Checks if this a second noise, a calm down mousey command
+        if frightened_mouse_state == True:
+            frightened_mouse_state = False
+            print("Mouse Calmed down")
+            mouseLEDPin17.on()
+        else:
+            frightened_mouse_state = True
+            
+            # turn off/on the mouse for a bit to punish user for being too rough
+            mouseLEDPin17.off()
+            time.sleep(0.5)
+            mouseLEDPin17.on()
+            time.sleep(1)
+            mouseLEDPin17.off()
+            time.sleep(1)
+            mouseLEDPin17.on()
+            time.sleep(1)
+            mouseLEDPin17.off()
+            
         
+        # flash the warning LED
+        for x in range(3):
+            interalLED.on()
+            time.sleep(0.3)
+            interalLED.off()
+            time.sleep(0.3)
+    
+
     elif button.value() == 0:
         print("Button Test Pushed")
         soundPin16.on()
@@ -63,14 +87,28 @@ while True:
         
         i=i+1
         #print(i)
-        if i%1000 == 1:
-            print("nothing yet")
+        if i%1000000 == 1:
+            print("Mouse is happy")
+            
             
             # flash LED to show it's working if no PC connected
             interalLED.on()
             time.sleep(0.5)
             interalLED.off()
             time.sleep(0.5)
+            
+        if frightened_mouse_state == True:
+            
+            c=c+1
+            if i%1000 == 1:
+                print("Mouse is too scared to work")
+            
+                for x in range(3):
+                    interalLED.on()
+                    time.sleep(0.2)
+                    interalLED.off()
+                    time.sleep(0.2)
+            
         
     #tick interval
     #time.sleep(0.01)
