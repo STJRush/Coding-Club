@@ -1,8 +1,8 @@
 {
     "manifest_version": 3,
-    "name": "The Good Place Word Replacer",
+    "name": "Son of a peach!: Grown up Word replacer (like in the Good Place)",
     "version": "1.0",
-    "description": "Replaces bad words with good words like in The Good Place.",
+    "description": "All 623 bad words from facebook's offensive word list replaced (by an Irish person) with nicer words more appropriate for little ones. Oh and also BRUH/BRO. No more BRUHS",
     "icons": {
       "128": "icon.png"
     },
@@ -11,6 +11,12 @@
         "matches": ["<all_urls>"],
         "js": ["content.js"],
         "run_at": "document_end"
+      }
+    ],
+    "web_accessible_resources": [
+      {
+        "resources": ["wordmap.csv"],
+        "matches": ["<all_urls>"]
       }
     ]
   }
