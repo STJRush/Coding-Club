@@ -2,7 +2,7 @@
     "manifest_version": 3,
     "name": "Son of a peach!: Grown up Word replacer (like in the Good Place)",
     "version": "1.0",
-    "description": "All 623 bad words from facebook's offensive word list replaced (by an Irish person) with nicer words more appropriate for little ones. Oh and also BRUH/BRO. No more BRUHS",
+    "description": "All 623 bad words from facebook's offensive word list replaced with more appropriate words for little ones.",
     "icons": {
       "128": "icon.png"
     },
