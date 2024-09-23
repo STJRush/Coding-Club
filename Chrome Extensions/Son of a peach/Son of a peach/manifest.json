@@ -1,8 +1,8 @@
 {
     "manifest_version": 3,
-    "name": "Son of a peach!: Grown up Word replacer (like in the Good Place)",
+    "name": "Son of a peach!: Offensive Word Replacer",
     "version": "1.0",
-    "description": "All 623 bad words from facebook's offensive word list replaced with more appropriate words for little ones.",
+    "description": "Replace offensive words in your browser with similar sounding but harmless words Eg. Holy Shirt, What the fork?",
     "icons": {
       "128": "icon.png"
     },
