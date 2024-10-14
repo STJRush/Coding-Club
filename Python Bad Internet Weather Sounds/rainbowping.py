@@ -310,7 +310,7 @@ try:
                         snapshot=avSnappy
 
                         # INTERNALLY ALL IS WELL
-                        if snapshot < 10:
+                        if snapshot < 5:
                             print(Style.BRIGHT+Fore.WHITE + Back.GREEN + "We're all good")
                             
                             if birdsAreTweeting is False:        # if birds are not tweeting, if it's raining...         
@@ -321,7 +321,7 @@ try:
                             birdsAreTweeting = True # set birds are tweeting flag to TRUE
 
                         # COULD BE BETTER DRIZZEL
-                        elif snapshot > 10 and snapshot < 100:
+                        elif snapshot > 5 and snapshot < 100:
                             print(Fore.BLACK + Back.YELLOW + "Could be better")
                             mixer.music.stop()
                             mixer.music.load("drizzle.mp3")
@@ -375,13 +375,19 @@ try:
         try:
             
             print(Style.BRIGHT+Back.BLUE+Fore.WHITE +"EXTERNAL INTERNET TEST")
-            st = speedtest.Speedtest()
+            try:
+                st = speedtest.Speedtest()
             
-            listOfTestSpeeds=[]
+                listOfTestSpeeds=[]
+            except:
+                print("oops")
             for testNo in range(3):
-                speedResult = st.download()//1000000 # gets speed in Mbps
-                print("Download Speed Test No.",testNo,speedResult,"Mbps")
-                listOfTestSpeeds.append(speedResult)
+                try:
+                    speedResult = st.download()//1000000 # gets speed in Mbps
+                    print("Download Speed Test No.",testNo,speedResult,"Mbps")
+                    listOfTestSpeeds.append(speedResult)
+                except:
+                    speedResult = 0
 
             averageExternalInternetSpeed = round(int(statistics.mean(listOfTestSpeeds)))
             print("----> Average Download speed is", averageExternalInternetSpeed,"Mbps")
