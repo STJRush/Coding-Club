@@ -1,0 +1,23 @@
+{
+    "manifest_version": 3,
+    "name": "Son of a peach!: Offensive Word Replacer",
+    "version": "1.0",
+    "description": "Replace offensive words in your browser with similar sounding but harmless words Eg. Holy Shirt, What the fork?",
+    "icons": {
+      "128": "icon.png"
+    },
+    "content_scripts": [
+      {
+        "matches": ["<all_urls>"],
+        "js": ["content.js"],
+        "run_at": "document_end"
+      }
+    ],
+    "web_accessible_resources": [
+      {
+        "resources": ["wordmap.csv"],
+        "matches": ["<all_urls>"]
+      }
+    ]
+  }
+  
