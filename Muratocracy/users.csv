@@ -1,0 +1,6 @@
+username,password,role
+admin,admin,admin
+user,user,user
+alice,secret,user
+bob,1234,user
+

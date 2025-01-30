@@ -1,0 +1,5 @@
+id,title,quiz,votes
+0,Should we have a uniform?,"[{""question"": ""Which is a common reason for uniforms?"", ""choices"": [""Fashion statement"", ""School identity"", ""Personal choice"", ""Holiday wear""], ""correct_index"": 1}, {""question"": ""Uniforms are often said to promote..."", ""choices"": [""Distraction in class"", ""Bullying"", ""Equality"", ""Higher costs""], ""correct_index"": 2}]","{""Yes"": 0, ""No"": 0, ""voted_users"": []}"
+1,dada,"[{""question"": ""dddd"", ""choices"": [""111"", ""222"", ""333"", ""444""], ""correct_index"": 1}]","{""Yes"": 20, ""No"": 0, ""voted_users"": [""user""]}"
+2,aaaaa,"[{""question"": ""123123"", ""choices"": [""12"", ""23"", ""34"", ""56""], ""correct_index"": 1}]","{""Yes"": 20, ""No"": 10, ""voted_users"": [""bob""]}"
+3,who best,"[{""question"": ""Who besty?"", ""choices"": [""u"", ""me"", ""i"", ""them""], ""correct_index"": 3}, {""question"": ""and then?"", ""choices"": [""gg"", ""sss"", ""aqq"", ""eee""], ""correct_index"": 3}]","{""Yes"": 5, ""No"": 0, ""voted_users"": [""user""]}"
