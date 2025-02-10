@@ -2,7 +2,13 @@
 
 {% block page_content %}
 <div style="text-align:center;">
+  <!-- Hidden/inline audio element -->
+  <audio id="newsAudio" src="{{ url_for('static', filename='news85.mp3') }}"></audio>
+
+  <!-- Clickable image to trigger audio playback -->
   <img src="{{ url_for('static', filename='Ireland.PNG') }}"
-       style="display:block; margin:0 auto; width:70%; height:auto;" alt="Ireland">
+       style="display:block; margin:0 auto; width:70%; height:auto; cursor:pointer;"
+       alt="Ireland"
+       onclick="document.getElementById('newsAudio').play()">
 </div>
 {% endblock %}
