@@ -719,4 +719,4 @@ if __name__ == '__main__':
         save_topics(topics)
 
     print('Starting server on http://127.0.0.1:5000/')
-    app.run(debug=True)
+    app.run(debug=False, port=6006)
