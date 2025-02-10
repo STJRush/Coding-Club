@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block page_content %}
+
+{% if page_number == 100 %}
+  <!-- Centered image "Ireland.PNG" filling the width of the screen -->
+  <div style="text-align:center;">
+    <img src="{{ url_for('static', filename='Ireland.PNG') }}"
+         style="display:block; margin:0 auto; width:70%; height:auto;" alt="Ireland">
+  </div>
+
+{% elif page_number == 101 %}
+  <!-- HEADLINES, doubled font size to 48px -->
+  <div style="color:#18C5D8; font-size:48px; margin-bottom:0.25em;">
+    HEADLINES
+  </div>
+  <div style="color:#18C5D8; font-size:16px; margin-bottom:1em;">
+    TODAY'S MAIN NEWS STORIES
+  </div>
+
+  {% if headlines %}
+    <ul>
+      {% for item in headlines %}
+        <li>
+          <strong>{{ item.title }}</strong><br>
+          {{ item.summary }}<br>
+          <em><a href="{{ item.link }}" target="_blank">Read more</a></em>
+        </li>
+        <br>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No news headlines available.</p>
+  {% endif %}
+
+  <!-- Example nav links at the bottom -->
+  <p>
+    Sport 200 &nbsp;&nbsp; Weather 160 &nbsp;&nbsp; Finance 130
+  </p>
+
+{% else %}
+  <!-- Default layout for other pages -->
+  <h2>{{ page_title }}</h2>
+
+  {% if headlines %}
+    <ul>
+      {% for item in headlines %}
+        <li>
+          <strong>{{ item.title }}</strong><br>
+          {{ item.summary }}<br>
+          <em><a href="{{ item.link }}" target="_blank">Read more</a></em>
+        </li>
+        <br>
+      {% endfor %}
+    </ul>
+  {% elif content_list %}
+    <ul>
+      {% for line in content_list %}
+        <li>{{ line }}</li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No content available.</p>
+  {% endif %}
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Aertel Replica</title>
+    <!-- Pixel/8-bit style font VT323 -->
+    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        background-color: black;
+        color: #047504;
+        font-family: 'VT323', monospace;
+        font-size: 48px;
+      }
+      .header {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        background-color: black;
+        color: #FFFFFF;
+        padding: 5px;
+      }
+      .page-number, .date-area, .clock {
+        flex: 10;
+        text-align: center;
+        font-family: 'Press Start 2P', monospace;
+        font-size: 24px;
+        
+        
+      }
+      .page-number {
+        text-align: left;
+      }
+      .clock {
+        text-align: right;
+      }
+      .content {
+        padding: 10px;
+      }
+      a {
+        color: #026202;
+        text-decoration: none;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+   
+      .vt323-text {
+        font-family: 'VT323', monospace;
+      }
+      .pressstart-text {
+        font-family: 'Press Start 2P', monospace;
+      }
+
+            .courier-prime-regular {
+        font-family: "Courier Prime", serif;
+        font-weight: 400;
+        font-style: normal;
+      }
+
+      .courier-prime-bold {
+        font-family: "Courier Prime", serif;
+        font-weight: 700;
+        font-style: normal;
+      }
+
+      .courier-prime-regular-italic {
+        font-family: "Courier Prime", serif;
+        font-weight: 400;
+        font-style: italic;
+      }
+
+      .courier-prime-bold-italic {
+        font-family: "Courier Prime", serif;
+        font-weight: 700;
+        font-style: italic;
+      }
+
+      .light-background {
+      background-color: #18C5D8; /* Light background color */
+      padding: 10px;            /* Padding around the text */
+      display: inline-block;    /* So the background only wraps the text */
+      font-family: 'VT323', monospace;
+      font-size: 48px;
+      }
+      .text-red {
+        color: rgb(158, 14, 14);
+      }
+      .text-blue {
+        color: rgb(34, 34, 240);
+      }
+      /* A full-width bar with light blue background */
+      .full-width-background {
+        background-color: #18C5D8;
+        width: 100%;
+        padding: 0px;
+        text-align: center; /* Center the text inside the bar */
+        box-sizing: border-box; /* Ensures padding doesn't exceed 100% width */
+      }
+      
+
+      @font-face {
+        font-family: 'NeubornBold';
+        src: url('/static/fonts/neuborn-bold.ttf') format('truetype');
+        /* You can also specify font-weight or font-style if needed */
+        font-weight: bold;
+        font-style: normal;
+  }
+
+      
+      
+
+
+
+
+
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <!-- The page number is green; the rest remains white -->
+      <div class="page-number">
+        <span style="color:#075f07;">P{{ page_number }}    </span>  AERTEL 1 {{ page_number }}
+      </div>
+      <div class="date-area" id="dateArea">
+        {{ today_date }}
+      </div>
+      <div class="clock" id="clockArea"></div>
+    </div>
+
+    <div class="content">
+      {% block page_content %}{% endblock %}
+    </div>
+
+    <script>
+      // Update clock every second in HH:MM:SS format
+      function updateClock() {
+        var now = new Date()
+        var hours = now.getHours()
+        var minutes = now.getMinutes()
+        var seconds = now.getSeconds()
+
+        if (hours < 10) hours = "0" + hours
+        if (minutes < 10) minutes = "0" + minutes
+        if (seconds < 10) seconds = "0" + seconds
+
+        var timeString = hours + ":" + minutes + ":" + seconds
+        document.getElementById("clockArea").innerHTML = timeString
+      }
+
+      setInterval(updateClock, 1000)
+      updateClock()
+    </script>
+  </body>
+</html>

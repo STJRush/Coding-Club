@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block page_content %}
+<h2>{{ page_title }}</h2>
+
+{% if content_list %}
+  <ul>
+    {% for line in content_list %}
+      <li>{{ line }}</li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p>No content available.</p>
+{% endif %}
+{% endblock %}

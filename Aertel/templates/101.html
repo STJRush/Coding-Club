@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block page_content %}
+<!-- HEADLINES in #18C5D8, 128px, bold -->
+<div style="color:#18C5D8; font-family: 'NeubornBold', monospace;font-size:160px; margin-bottom:0.01em;padding:1px; font-weight:bold;">
+  Headlines
+</div>
+<!-- Subtitle in white (#FFFFFF), 48px -->
+<div style="color:#FFFFFF; font-size:60px;">TODAY'S MAIN NEWS STORIES</div>
+<div style="color:#18C5D8; font-family: courier-prime-regular, monospace; font-size:48px;">
+‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
+  </div>
+
+{% if headlines %}
+  <!-- Remove bullet points and extra spacing -->
+  <ul style="list-style-type:none; margin:0; padding:0;">
+    {% for item in headlines[:10] %}
+      {% set page_num = 104 + loop.index0 %}
+      <li style="margin:0; padding:0;">
+        <!-- Page number in white, then headline in #18C5D8, all on one line -->
+        <span style="color:#FFFFFF; font-size:48px;">{{ page_num }} </span>
+        <span style="color:#18C5D8; font-size:48px;">{{ item.title }}</span>
+      </li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p>No news headlines available.</p>
+{% endif %}
+<div style="color:#18C5D8; font-size:48px;">150 <span style="color:#f9feff; ">LOTTO</span></div>
+
+<div class="full-width-background">
+    <span class="text-blue">Sport </span>
+    <span class="text-red">200</span>
+    &nbsp;&nbsp;
+    <span class="text-blue">Weather </span>
+    <span class="text-red">160</span>
+    &nbsp;&nbsp;
+    <span class="text-blue">Finance </span>
+    <span class="text-red">130</span>
+  </div>
+
+{% endblock %}

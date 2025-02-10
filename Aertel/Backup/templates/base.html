@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Aertel Replica</title>
+    <!-- Import a pixel/8-bit style font -->
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        background-color: black;
+        color: #00FF00;
+        font-family: 'Press Start 2P', monospace;
+        font-size: 14px;
+      }
+      .header {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        background-color: black;
+        color: #FFFFFF;
+        padding: 5px;
+      }
+      .page-number, .date-area, .clock {
+        flex: 1;
+        text-align: center;
+        font-weight: bold;
+      }
+      .page-number {
+        text-align: left;
+      }
+      .clock {
+        text-align: right;
+      }
+      .content {
+        padding: 10px;
+      }
+      a {
+        color: #00FF00;
+        text-decoration: none;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <!-- Only the page number in green -->
+      <div class="page-number">
+        <span style="color:#00FF00;">P{{ page_number }}</span> AERTEL 1 {{ page_number }}
+      </div>
+      <div class="date-area" id="dateArea">
+        {{ today_date }}
+      </div>
+      <div class="clock" id="clockArea"></div>
+    </div>
+
+    <div class="content">
+      {% block page_content %}{% endblock %}
+    </div>
+
+    <script>
+      // Update clock every second in HH:MM:SS format
+      function updateClock() {
+        var now = new Date()
+        var hours = now.getHours()
+        var minutes = now.getMinutes()
+        var seconds = now.getSeconds()
+
+        if (hours < 10) hours = "0" + hours
+        if (minutes < 10) minutes = "0" + minutes
+        if (seconds < 10) seconds = "0" + seconds
+
+        var timeString = hours + ":" + minutes + ":" + seconds
+        document.getElementById("clockArea").innerHTML = timeString
+      }
+
+      setInterval(updateClock, 1000)
+      updateClock()
+    </script>
+  </body>
+</html>

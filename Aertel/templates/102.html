@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block page_content %}
+<div style="color:#f5f2f2; font-family: 'Press Start 2P', monospace;font-size:96px; margin-bottom:0.01em; font-weight:bold;">
+    News
+  </div>
+  <div style="color:#ffffff; font-family: courier-prime-regular, monospace; font-size:48px; margin-bottom:1em;">
+   ‾‾‾‾‾‾‾‾‾‾‾‾‾‾
+  </div>
+
+{% if headlines %}
+  <ul>
+    {% for item in headlines %}
+      <li>
+        <strong>{{ item.title }}</strong><br>
+        {{ item.summary }}<br>
+        <em><a href="{{ item.link }}" target="_blank">Read more</a></em>
+      </li>
+      <br>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p>No news available.</p>
+{% endif %}
+{% endblock %}
