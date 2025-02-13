@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block page_content %}
+
+<!-- Big Title -->
+<div style="color:#CE3AC2; font-size:128px; margin-bottom:0.01em; font-weight:bold; font-family: 'NeubornBold', monospace;">
+  WEATHER ―――――――――
+</div>
+
+<!-- Subheading, White -->
+<div style="color:#FFFFFF; font-size:48px; margin-bottom:1em;">
+  TODAY AND TOMORROW &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style="color:#CE3AC2;">Issued {{ issued_time }}</span>
+</div>
+
+<div style="color:#CE3AC2; font-family: 'Courier Prime', monospace; font-size:48px;">
+  ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
+</div>
+<table style="border:none; border-collapse:collapse; width:50%;">
+  <tr>
+    <td style="border:none; padding:5px; color:#f9feff;">Today's Forcast</td>
+    <td style="border:none; padding:5px; text-align:left;">161</td>
+  </tr>
+  <tr>
+    <td style="border:none; padding:5px; color:#f9feff;">Sea Area Forcast</td>
+    <td style="border:none; padding:5px; text-align:left;">162</td>
+  </tr>
+  <tr>
+    <td style="border:none; padding:5px; color:#f9feff;">Gale Warning</td>
+    <td style="border:none; padding:5px; text-align:left;">163</td>
+  </tr>
+  <tr>
+    <td style="border:none; padding:5px; color:#f9feff;">Holiday weather with Panorama</td>
+    <td style="border:none; padding:5px; text-align:left;">165</td>
+  </tr>
+  <tr>
+    <td style="border:none; padding:5px;color:#f9feff;">Weatherdial Regional Forcasts From Met Eireann</td>
+    <td style="border:none; padding:5px; text-align:left;">166</td>
+  </tr>
+</table>
+
+
+<div class="full-width-pink-background">
+  <span style="color:#f9feff;">Call Weatherdial On 1550 123 123</span>
+
+</div>
+{% endblock %}

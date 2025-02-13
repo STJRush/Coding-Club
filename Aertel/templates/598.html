@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block page_content %}
+
+<!-- Big Title -->
+<div style="color:#CE3AC2; font-size:128px; margin-bottom:0.01em; font-weight:bold; font-family: 'NeubornBold', monospace;">
+  WEATHER ―――――――――
+</div>
+
+<!-- Subheading, White -->
+<div style="color:#FFFFFF; font-size:48px; margin-bottom:1em;">
+  TODAY AND TOMORROW &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style="color:#CE3AC2;">Issued {{ issued_time }}</span>
+</div>
+
+<div style="color:#CE3AC2; font-family: 'Courier Prime', monospace; font-size:48px;">
+  ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
+</div>
+
+<!-- Now display the forecast data from variables passed in by Python -->
+<div style="color:#FFFFFF; font-size:48px;">
+  <p><strong>Region:</strong> {{ region_name }}</p>
+  <p><strong>Today:</strong> {{ today_text }}</p>
+  <p><strong>Tonight:</strong> {{ tonight_text }}</p>
+  <p><strong>Tomorrow:</strong> {{ tomorrow_text }}</p>
+  <p><strong>Outlook:</strong> {{ outlook_text }}</p>
+</div>
+
+<div style="color:#18C5D8; font-size:48px;">
+  150 <span style="color:#f9feff;">LOTTO</span>
+</div>
+
+<div class="full-width-background">
+  <span class="text-blue">Sport </span>
+  <span class="text-red">200</span>
+  &nbsp;&nbsp;
+  <span class="text-blue">Weather </span>
+  <span class="text-red">160</span>
+  &nbsp;&nbsp;
+  <span class="text-blue">Finance </span>
+  <span class="text-red">130</span>
+</div>
+{% endblock %}
