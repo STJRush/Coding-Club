@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Kayaking GO/NO GO</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <h1 class="{{ status_class }}">{{ status }}</h1>
+    <div class="details">
+        <p><strong>Wind Speed:</strong> {{ wind_speed }} m/s</p>
+        <p><strong>Wind Direction:</strong> {{ wind_direction }}°</p>
+        <p><strong>Decision Rule:</strong> {{ decision_rule }}</p>
+    </div>
+</body>
+</html>

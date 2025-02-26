@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>School Map</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<nav>
+  <a href="{{ url_for('index') }}">Home</a> |
+  <a href="{{ url_for('settings') }}">Settings</a> |
+  <a href="{{ url_for('school_map') }}">Map</a>
+</nav>
+
+<h1>School Map</h1>
+
+<button id="edit-toggle">Enable Edit Mode</button>
+
+<div id="map-container">
+    <img src="{{ url_for('static', filename='map.png') }}" alt="School Map" width="672" height="950">
+
+    {% for idx, row in targets_df.iterrows() %}
+        {% set short_name = row["Short Name"] %}
+        {% set x = row["MapX"] %}
+        {% set y = row["MapY"] %}
+        {% set status_rec = latest_status[short_name] %}
+        
+        {% if status_rec["status"] == "OK" %}
+            {% set color_class = "status-ok-text" %}
+        {% elif status_rec["status"] == "High Ping" %}
+            {% set color_class = "status-high-text" %}
+        {% else %}
+            {% set color_class = "status-down-text" %}
+        {% endif %}
+        
+        <div class="map-label {{ color_class }}"
+             data-shortname="{{ short_name }}"
+             style="left: {{ x }}px; top: {{ y }}px;">
+            {{ short_name }}
+        </div>
+    {% endfor %}
+</div>
+
+<script>
+const editToggleBtn = document.getElementById("edit-toggle");
+let editMode = false;
+
+editToggleBtn.addEventListener("click", function() {
+    editMode = !editMode;
+    this.textContent = editMode ? "Disable Edit Mode" : "Enable Edit Mode";
+    
+    const labels = document.querySelectorAll(".map-label");
+    labels.forEach(label => {
+        if (editMode) {
+            label.classList.add("editable");
+            // Add mousedown listener
+            label.addEventListener("mousedown", onMouseDown);
+        } else {
+            label.classList.remove("editable");
+            // Remove mousedown listener
+            label.removeEventListener("mousedown", onMouseDown);
+        }
+    });
+});
+
+let currentDrag = null;
+let offsetX = 0;
+let offsetY = 0;
+
+function onMouseDown(e) {
+    if (!editMode) return;
+    // The label being dragged
+    currentDrag = e.target;
+    // offset within the label
+    const rect = currentDrag.getBoundingClientRect();
+    offsetX = e.clientX - rect.left;
+    offsetY = e.clientY - rect.top;
+
+    // Add listeners for mousemove/up on document
+    document.addEventListener("mousemove", onMouseMove);
+    document.addEventListener("mouseup", onMouseUp);
+}
+
+function onMouseMove(e) {
+    if (!editMode || !currentDrag) return;
+    e.preventDefault();
+    let containerRect = document.getElementById("map-container").getBoundingClientRect();
+
+    // Compute new position relative to container
+    let newLeft = e.clientX - containerRect.left - offsetX;
+    let newTop = e.clientY - containerRect.top - offsetY;
+
+    // Keep label within map bounds if desired
+    // For example, clamp to 0..(containerWidth - labelWidth)
+    // but here's a simple approach with no clamping:
+    currentDrag.style.left = newLeft + "px";
+    currentDrag.style.top = newTop + "px";
+}
+
+function onMouseUp(e) {
+    if (!editMode || !currentDrag) return;
+
+    // final position
+    let newLeft = parseInt(currentDrag.style.left, 10);
+    let newTop = parseInt(currentDrag.style.top, 10);
+    let shortName = currentDrag.getAttribute("data-shortname");
+
+    // Save to server via fetch
+    let bodyData = { short_name: shortName, x: newLeft, y: newTop };
+    fetch("{{ url_for('save_position') }}", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(bodyData)
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (!data.success) {
+            alert("Could not save position: " + data.message);
+        }
+    })
+    .catch(err => {
+        alert("Error saving position");
+        console.error(err);
+    });
+
+    // cleanup
+    document.removeEventListener("mousemove", onMouseMove);
+    document.removeEventListener("mouseup", onMouseUp);
+    currentDrag = null;
+}
+</script>
+
+</body>
+</html>

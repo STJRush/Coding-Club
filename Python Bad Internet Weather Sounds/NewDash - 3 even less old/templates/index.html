@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Ping Monitor</title>
+    <!-- Our static CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    
+    <!-- Bokeh resources & scripts -->
+    {{ bokeh_resources|safe }}
+    {{ script|safe }}
+</head>
+<body>
+
+<nav>
+  <a href="{{ url_for('index') }}">Home</a> |
+  <a href="{{ url_for('settings') }}">Settings</a>
+</nav>
+
+<h1>School Network Ping Monitor</h1>
+
+<div class="flex-container">
+    <div class="left-panel">
+        <h2>Device Status</h2>
+        <table>
+            <tr>
+                <th>Short Name</th>
+                <th>Latest Ping (ms)</th>
+                <th>Status</th>
+            </tr>
+            {% for idx, row in targets_df.iterrows() %}
+                {% set short_name = row["Short Name"] %}
+                {% set full_name = row["Full Name"] %}
+                {% set note = row["Note"] %}
+                {% set status_rec = latest_status[short_name] %}
+                {% if status_rec["status"] == "OK" %}
+                    {% set row_class = "status-ok" %}
+                {% elif status_rec["status"] == "High Ping" %}
+                    {% set row_class = "status-high" %}
+                {% else %}
+                    {% set row_class = "status-down" %}
+                {% endif %}
+                <tr class="{{ row_class }}">
+                    <td>
+                        <div class="tooltip">
+                            {{ short_name }}
+                            <span class="tooltiptext">
+                                <b>{{ full_name }}</b><br>
+                                {{ note }}
+                            </span>
+                        </div>
+                    </td>
+                    <td>
+                        {% if status_rec["ping"] is not none %}
+                            {{ "%.2f"|format(status_rec["ping"]) }}
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </td>
+                    <td>{{ status_rec["status"] }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+    <div class="right-panel">
+        <h2>Ping History</h2>
+        <div>
+            {{ div|safe }}
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

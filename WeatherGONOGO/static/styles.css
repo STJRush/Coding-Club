@@ -1,0 +1,24 @@
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    padding-top: 50px;
+    background-color: #f0f8ff;
+}
+
+h1 {
+    font-size: 3em;
+    margin-bottom: 0.5em;
+}
+
+.status-go {
+    color: green;
+}
+
+.status-nogo {
+    color: red;
+}
+
+.details {
+    font-size: 1.2em;
+    margin-top: 20px;
+}
