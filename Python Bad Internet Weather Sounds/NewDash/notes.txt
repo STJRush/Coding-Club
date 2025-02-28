@@ -1,2 +1,5 @@
 SW1-05 is bottom 24 port switch in corner of R17 DCG Room
 R19SciPrefab is downstream of R17DCG1 so that'll go offline if R17DCG1 does. 
+
+
+10Port Switch in Room 38 Library not on the list?

@@ -50,7 +50,8 @@ for col in ["MapX", "MapY"]:
     if col not in targets_df.columns:
         targets_df[col] = 0  # default to 0 if missing
 
-targets_df = targets_df[df_cols]  # Reorder or ensure columns
+# Reorder or ensure columns
+targets_df = targets_df[df_cols]
 
 # Convert MapX/MapY to numeric, ignoring errors
 targets_df["MapX"] = pd.to_numeric(targets_df["MapX"], errors="coerce").fillna(0)
@@ -109,7 +110,6 @@ def update_map_position(short_name, new_x, new_y):
     We update the in-memory DataFrame and rewrite CSV.
     """
     global targets_df
-    # Find the row for short_name
     mask = (targets_df["Short Name"] == short_name)
     if not mask.any():
         return False  # not found, do nothing
@@ -249,4 +249,4 @@ def save_position():
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    app.run(host="0.0.0.0", port=5006, debug=True)

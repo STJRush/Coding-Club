@@ -32,6 +32,8 @@
                 {% set full_name = row["Full Name"] %}
                 {% set note = row["Note"] %}
                 {% set status_rec = latest_status[short_name] %}
+
+                {# Determine row color #}
                 {% if status_rec["status"] == "OK" %}
                     {% set row_class = "status-ok" %}
                 {% elif status_rec["status"] == "High Ping" %}
@@ -39,10 +41,20 @@
                 {% else %}
                     {% set row_class = "status-down" %}
                 {% endif %}
+
+                {# Determine the emoji #}
+                {% if status_rec["status"] == "OK" %}
+                    {% set emoji = "✅" %}
+                {% elif status_rec["status"] == "High Ping" %}
+                    {% set emoji = "😟" %}
+                {% else %}
+                    {% set emoji = "❌" %}
+                {% endif %}
+
                 <tr class="{{ row_class }}">
                     <td>
                         <div class="tooltip">
-                            {{ short_name }}
+                            {{ short_name }} {{ emoji }}
                             <span class="tooltiptext">
                                 <b>{{ full_name }}</b><br>
                                 {{ note }}
