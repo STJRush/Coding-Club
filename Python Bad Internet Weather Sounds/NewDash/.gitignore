@@ -1,0 +1,27 @@
+# Ignore credentials file
+credentials.json
+
+# Ignore secrets file
+secrets.py
+
+# Byte-compiled  optimized  DLL files
+__pycache__
+.py[cod]
+$py.class
+
+# Virtual environment
+venv
+ENV
+.env
+
+# Logs and databases
+.log
+db.sqlite3
+instance
+
+# IDE files
+.vscode
+.idea
+
+# MacOS files
+.DS_Store

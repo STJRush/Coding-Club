@@ -15,35 +15,32 @@
         <span style="float:right;">
           <a href="{{ url_for('run_speed_test') }}">📻 Test Now</a>
         </span>
-      </nav>
+    </nav>
 
 <h1>Ping Settings</h1>
 
-<!-- Current ping interval -->
-<p>Current Ping Interval: <strong>{{ current_interval }} seconds</strong></p>
+<!-- New: Google Tasks Login Button -->
+<p>
+  <a href="{{ url_for('tasks_login') }}" class="login-button">Login with Google Tasks</a> |
+  <a href="{{ url_for('logout') }}">Logout</a>
+</p>
 
+<p>Current Ping Interval: <strong>{{ current_interval }} seconds</strong></p>
 <form method="POST" action="{{ url_for('settings') }}">
     <label for="ping_interval">Choose a new ping interval:</label>
     <select id="ping_interval" name="ping_interval">
         {% for val, label in interval_options %}
-            <option value="{{ val }}"
-                {% if val == current_interval %}selected{% endif %}
-            >{{ label }}</option>
+            <option value="{{ val }}" {% if val == current_interval %}selected{% endif %}>{{ label }}</option>
         {% endfor %}
     </select>
-
     <h2>Visible Device Types</h2>
     {% for dt in all_device_types %}
         <label>
-            <input type="checkbox" name="device_types"
-                   value="{{ dt }}"
-                   {% if dt in visible_device_types %}checked{% endif %}
-            >
+            <input type="checkbox" name="device_types" value="{{ dt }}" {% if dt in visible_device_types %}checked{% endif %}>
             {{ dt }}
         </label>
         <br>
     {% endfor %}
-
     <br>
     <button type="submit">Save</button>
 </form>

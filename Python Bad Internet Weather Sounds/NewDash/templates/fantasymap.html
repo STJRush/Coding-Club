@@ -13,7 +13,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Uncial+Antiqua&display=swap" rel="stylesheet">
 
     <style>
-      /* Use "background.jpg" for the entire page background */
       body {
         margin: 0;
         padding: 0;
@@ -22,13 +21,11 @@
         background: url("{{ url_for('static', filename='background.jpg') }}") no-repeat center center fixed;
         background-size: cover;
       }
-
       nav a, nav span {
         color: #fff;
         text-decoration: none;
         margin-right: 10px;
       }
-
       .flex-container {
         display: flex;
       }
@@ -42,34 +39,36 @@
         justify-content: space-between;
         padding: 10px;
       }
-
       .speed-result {
         font-size: 1.5em;
         text-align: center;
         margin-bottom: 10px;
       }
-
-      /* We'll place "graphbackground.jpg" behind the chart container.
-         The chart is made transparent in app.py's .update_layout() so 
-         we should see the image behind the lines. */
-      .speed-chart {
-        background: url("{{ url_for('static', filename='graphbackground.jpg') }}") no-repeat center center;
-        background-size: cover;
-      }
-
+      .speed-chart { }
       .feedback-msg {
         margin-top: 10px;
         font-size: 1.1em;
-        /* maybe a lighter color? */
         color: #f0f0c9;
       }
-
       .map-label {
         background-color: transparent;
       }
-
-      h1, button {
-        margin: 10px;
+      /* New styling for the tasks list */
+      .tasks-readonly {
+        background: rgba(0, 0, 0, 0.6);
+        padding: 15px;
+        margin: 20px;
+        border-radius: 10px;
+      }
+      .tasks-readonly h2 {
+        margin-top: 0;
+      }
+      .tasks-readonly ul {
+        list-style: none;
+        padding-left: 0;
+      }
+      .tasks-readonly li {
+        margin-bottom: 8px;
       }
     </style>
 </head>
@@ -94,7 +93,6 @@
       <img src="{{ url_for('static', filename='fantasybackground.png') }}"
            alt="Fantasy Background"
            width="1200" height="900">
-
       {% for idx, row in targets_df.iterrows() %}
         {% set short_name = row["Short Name"] %}
         {% set device_type = row["Device Type"] %}
@@ -103,7 +101,6 @@
             {% set x = row["FantX"] %}
             {% set y = row["FantY"] %}
             {% set status = latest_status[short_name]["status"] %}
-
             {% if status == "OK" %}
                 {% set image_file = "healthy.gif" %}
             {% elif status == "High Ping" %}
@@ -113,7 +110,6 @@
             {% endif %}
             {% set folder = device_type if device_type else "Other" %}
             {% set image_path = folder ~ "/" ~ image_file %}
-
             <div class="map-label"
                  data-shortname="{{ short_name }}"
                  style="position:absolute; left: {{ x }}px; top: {{ y }}px;">
@@ -128,24 +124,34 @@
   </div>
 
   <div class="right-panel">
-    <!-- Top half: last speed test -->
     <div class="speed-result">
       {{ last_speed_str }}
     </div>
-    <!-- The chart, with the background behind it -->
     <div class="speed-chart">
       {{ graph_html|safe }}
     </div>
-
-    <!-- Show the fantasy feedback message below the chart -->
     <div class="feedback-msg">
-      {{ fantasy_feedback_msg|safe }}
+      {{ feedback_msg|safe }}
     </div>
-
   </div>
 </div>
 
+<!-- NEW: Read-Only Google Tasks List -->
+<div class="tasks-readonly">
+  <h2>Current Issues Tasks</h2>
+  {% if google_tasks %}
+    <ul>
+      {% for task in google_tasks %}
+        <li><strong>{{ task.title }}</strong> – Due: {{ task.due }}</li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No active tasks found.</p>
+  {% endif %}
+</div>
+
 <script>
+// (Existing map-editing JavaScript remains unchanged)
 const editToggleBtn = document.getElementById("edit-toggle");
 let editMode = false;
 
@@ -173,11 +179,9 @@ function onMouseDown(e) {
     if (!editMode) return;
     currentDrag = e.target.closest(".map-label");
     if (!currentDrag) return;
-
     const rect = currentDrag.getBoundingClientRect();
     offsetX = e.clientX - rect.left;
     offsetY = e.clientY - rect.top;
-
     document.addEventListener("mousemove", onMouseMove);
     document.addEventListener("mouseup", onMouseUp);
 }
@@ -188,7 +192,6 @@ function onMouseMove(e) {
     let containerRect = document.getElementById("map-container").getBoundingClientRect();
     let newLeft = e.clientX - containerRect.left - offsetX;
     let newTop = e.clientY - containerRect.top - offsetY;
-
     currentDrag.style.left = newLeft + "px";
     currentDrag.style.top = newTop + "px";
 }
@@ -198,7 +201,6 @@ function onMouseUp(e) {
     let newLeft = parseInt(currentDrag.style.left, 10);
     let newTop = parseInt(currentDrag.style.top, 10);
     let shortName = currentDrag.getAttribute("data-shortname");
-
     let bodyData = { short_name: shortName, x: newLeft, y: newTop };
     fetch("{{ url_for('save_fantasy_position') }}", {
         method: "POST",
@@ -215,7 +217,6 @@ function onMouseUp(e) {
         alert("Error saving position");
         console.error(err);
     });
-
     document.removeEventListener("mousemove", onMouseMove);
     document.removeEventListener("mouseup", onMouseUp);
     currentDrag = null;
