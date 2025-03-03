@@ -7,19 +7,14 @@
 </head>
 <body>
 
-    <nav>
-        <a href="{{ url_for('index') }}">Home</a> |
-        <a href="{{ url_for('settings') }}">Settings</a> |
-        <a href="{{ url_for('school_map') }}">Map</a> |
-        <a href="{{ url_for('fantasy_map') }}">Fantasy Map</a>
-        <span style="float:right;">
-          <a href="{{ url_for('run_speed_test') }}">📻 Test Now</a>
-        </span>
-      </nav>
+<nav>
+  <a href="{{ url_for('index') }}">Home</a> |
+  <a href="{{ url_for('settings') }}">Settings</a> |
+  <a href="{{ url_for('school_map') }}">Map</a>
+</nav>
 
 <h1>Ping Settings</h1>
 
-<!-- Current ping interval -->
 <p>Current Ping Interval: <strong>{{ current_interval }} seconds</strong></p>
 
 <form method="POST" action="{{ url_for('settings') }}">
@@ -31,20 +26,6 @@
             >{{ label }}</option>
         {% endfor %}
     </select>
-
-    <h2>Visible Device Types</h2>
-    {% for dt in all_device_types %}
-        <label>
-            <input type="checkbox" name="device_types"
-                   value="{{ dt }}"
-                   {% if dt in visible_device_types %}checked{% endif %}
-            >
-            {{ dt }}
-        </label>
-        <br>
-    {% endfor %}
-
-    <br>
     <button type="submit">Save</button>
 </form>
 

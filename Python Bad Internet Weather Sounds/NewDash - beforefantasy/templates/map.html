@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>School Map</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<nav>
+  <a href="{{ url_for('index') }}">Home</a> |
+  <a href="{{ url_for('settings') }}">Settings</a> |
+  <a href="{{ url_for('school_map') }}">Map</a>
+</nav>
+
+<h1>Live School Map of Network (Ping Response)</h1>
+
+<button id="edit-toggle">Enable Edit Mode</button>
+
+<div id="map-container">
+    <img src="{{ url_for('static', filename='map.png') }}" alt="School Map" width="672" height="950">
+
+    {% for idx, row in targets_df.iterrows() %}
+        {% set short_name = row["Short Name"] %}
+        {% set x = row["MapX"] %}
+        {% set y = row["MapY"] %}
+        {% set status_rec = latest_status[short_name] %}
+
+        {# Determine color class for text #}
+        {% if status_rec["status"] == "OK" %}
+            {% set color_class = "status-ok-text" %}
+            {% set emoji = "✅" %}
+        {% elif status_rec["status"] == "High Ping" %}
+            {% set color_class = "status-high-text" %}
+            {% set emoji = "😟" %}
+        {% else %}
+            {% set color_class = "status-down-text" %}
+            {% set emoji = "❌" %}
+        {% endif %}
+
+        <div class="map-label {{ color_class }}"
+             data-shortname="{{ short_name }}"
+             style="left: {{ x }}px; top: {{ y }}px;">
+            {{ short_name }} {{ emoji }}
+        </div>
+    {% endfor %}
+</div>
+
+<script>
+const editToggleBtn = document.getElementById("edit-toggle");
+let editMode = false;
+
+editToggleBtn.addEventListener("click", function() {
+    editMode = !editMode;
+    this.textContent = editMode ? "Disable Edit Mode" : "Enable Edit Mode";
+    
+    const labels = document.querySelectorAll(".map-label");
+    labels.forEach(label => {
+        if (editMode) {
+            label.classList.add("editable");
+            label.addEventListener("mousedown", onMouseDown);
+        } else {
+            label.classList.remove("editable");
+            label.removeEventListener("mousedown", onMouseDown);
+        }
+    });
+});
+
+let currentDrag = null;
+let offsetX = 0;
+let offsetY = 0;
+
+function onMouseDown(e) {
+    if (!editMode) return;
+    currentDrag = e.target;
+    const rect = currentDrag.getBoundingClientRect();
+    offsetX = e.clientX - rect.left;
+    offsetY = e.clientY - rect.top;
+
+    document.addEventListener("mousemove", onMouseMove);
+    document.addEventListener("mouseup", onMouseUp);
+}
+
+function onMouseMove(e) {
+    if (!editMode || !currentDrag) return;
+    e.preventDefault();
+    let containerRect = document.getElementById("map-container").getBoundingClientRect();
+
+    let newLeft = e.clientX - containerRect.left - offsetX;
+    let newTop = e.clientY - containerRect.top - offsetY;
+
+    currentDrag.style.left = newLeft + "px";
+    currentDrag.style.top = newTop + "px";
+}
+
+function onMouseUp(e) {
+    if (!editMode || !currentDrag) return;
+
+    let newLeft = parseInt(currentDrag.style.left, 10);
+    let newTop = parseInt(currentDrag.style.top, 10);
+    let shortName = currentDrag.getAttribute("data-shortname");
+
+    // Save to server via fetch
+    let bodyData = { short_name: shortName, x: newLeft, y: newTop };
+    fetch("{{ url_for('save_position') }}", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(bodyData)
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (!data.success) {
+            alert("Could not save position: " + data.message);
+        }
+    })
+    .catch(err => {
+        alert("Error saving position");
+        console.error(err);
+    });
+
+    document.removeEventListener("mousemove", onMouseMove);
+    document.removeEventListener("mouseup", onMouseUp);
+    currentDrag = null;
+}
+</script>
+
+</body>
+</html>

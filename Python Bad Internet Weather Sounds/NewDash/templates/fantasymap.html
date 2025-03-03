@@ -2,110 +2,146 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <title>School Map</title>
+    <title>Fantasy Map</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-
-    <!-- For Plotly inlined usage, load Plotly CDN -->
+    
+    <!-- Plotly -->
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 
+    <!-- Load Uncial Antiqua from Google Fonts -->
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Uncial+Antiqua&display=swap" rel="stylesheet">
+
     <style>
+      /* Use "background.jpg" for the entire page background */
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: 'Uncial Antiqua', fantasy, cursive;
+        color: white;
+        background: url("{{ url_for('static', filename='background.jpg') }}") no-repeat center center fixed;
+        background-size: cover;
+      }
+
+      nav a, nav span {
+        color: #fff;
+        text-decoration: none;
+        margin-right: 10px;
+      }
+
       .flex-container {
         display: flex;
       }
       .left-panel {
         width: 75%;
-        padding-right: 10px;
       }
       .right-panel {
         width: 25%;
         display: flex;
         flex-direction: column;
-        justify-content: space-between; /* top speed + bottom chart */
-        padding-left: 10px;
+        justify-content: space-between;
+        padding: 10px;
       }
+
       .speed-result {
-        font-size: 1.5em; /* large font for the last speed */
-        color: #333;
+        font-size: 1.5em;
         text-align: center;
         margin-bottom: 10px;
       }
+
+      /* We'll place "graphbackground.jpg" behind the chart container.
+         The chart is made transparent in app.py's .update_layout() so 
+         we should see the image behind the lines. */
       .speed-chart {
-        /* The Plotly chart or container gets the rest of the space */
+        background: url("{{ url_for('static', filename='graphbackground.jpg') }}") no-repeat center center;
+        background-size: cover;
       }
-      /* Extra styling for feedback message */
+
       .feedback-msg {
         margin-top: 10px;
         font-size: 1.1em;
-        color: #444;
+        /* maybe a lighter color? */
+        color: #f0f0c9;
+      }
+
+      .map-label {
+        background-color: transparent;
+      }
+
+      h1, button {
+        margin: 10px;
       }
     </style>
 </head>
 <body>
 
-    <nav>
-        <a href="{{ url_for('index') }}">Home</a> |
-        <a href="{{ url_for('settings') }}">Settings</a> |
-        <a href="{{ url_for('school_map') }}">Map</a> |
-        <a href="{{ url_for('fantasy_map') }}">Fantasy Map</a>
-        <span style="float:right;">
-          <a href="{{ url_for('run_speed_test') }}">📻 Test Now</a>
-        </span>
-    </nav>
+<nav>
+  <a href="{{ url_for('index') }}">Home</a> |
+  <a href="{{ url_for('settings') }}">Settings</a> |
+  <a href="{{ url_for('school_map') }}">Map</a> |
+  <a href="{{ url_for('fantasy_map') }}">Fantasy Map</a>
+  <span style="float:right;">
+    <a href="{{ url_for('run_speed_test') }}">📻 Test Now</a>
+  </span>
+</nav>
 
-<h1>Live School Map of Network</h1>
+<h1>Fantasy Map</h1>
 <button id="edit-toggle">Enable Edit Mode</button>
 
 <div class="flex-container">
   <div class="left-panel">
     <div id="map-container" style="position:relative;">
-      <img src="{{ url_for('static', filename='map.png') }}"
-           alt="School Map"
-           width="672" height="950">
-      
+      <img src="{{ url_for('static', filename='fantasybackground.png') }}"
+           alt="Fantasy Background"
+           width="1200" height="900">
+
       {% for idx, row in targets_df.iterrows() %}
         {% set short_name = row["Short Name"] %}
         {% set device_type = row["Device Type"] %}
-        
         {% if device_type in visible_device_types %}
-            {% set x = row["MapX"] %}
-            {% set y = row["MapY"] %}
-            {% set status_rec = latest_status[short_name] %}
+            {% set fant_name = row["FantName"] or short_name %}
+            {% set x = row["FantX"] %}
+            {% set y = row["FantY"] %}
+            {% set status = latest_status[short_name]["status"] %}
 
-            {% if status_rec["status"] == "OK" %}
-                {% set color_class = "status-ok-text" %}
-                {% set emoji = "✅" %}
-            {% elif status_rec["status"] == "High Ping" %}
-                {% set color_class = "status-high-text" %}
-                {% set emoji = "😟" %}
+            {% if status == "OK" %}
+                {% set image_file = "healthy.gif" %}
+            {% elif status == "High Ping" %}
+                {% set image_file = "slow.gif" %}
             {% else %}
-                {% set color_class = "status-down-text" %}
-                {% set emoji = "❌" %}
+                {% set image_file = "unreachable.gif" %}
             {% endif %}
+            {% set folder = device_type if device_type else "Other" %}
+            {% set image_path = folder ~ "/" ~ image_file %}
 
-            <div class="map-label {{ color_class }}"
+            <div class="map-label"
                  data-shortname="{{ short_name }}"
                  style="position:absolute; left: {{ x }}px; top: {{ y }}px;">
-                {{ short_name }} {{ emoji }}
+                <img src="{{ url_for('static', filename=image_path) }}"
+                     width="60" height="60">
+                <br>
+                {{ fant_name }}
             </div>
         {% endif %}
       {% endfor %}
     </div>
   </div>
 
-  <!-- Right Panel for Speed Info -->
   <div class="right-panel">
-    <!-- Top half: Last speed test result in large font -->
+    <!-- Top half: last speed test -->
     <div class="speed-result">
       {{ last_speed_str }}
     </div>
-    <!-- Bottom half: Plotly chart -->
+    <!-- The chart, with the background behind it -->
     <div class="speed-chart">
       {{ graph_html|safe }}
     </div>
-    <!-- Feedback comparing latest speed to typical -->
+
+    <!-- Show the fantasy feedback message below the chart -->
     <div class="feedback-msg">
-      {{ feedback_msg|safe }}
+      {{ fantasy_feedback_msg|safe }}
     </div>
+
   </div>
 </div>
 
@@ -150,7 +186,6 @@ function onMouseMove(e) {
     if (!editMode || !currentDrag) return;
     e.preventDefault();
     let containerRect = document.getElementById("map-container").getBoundingClientRect();
-
     let newLeft = e.clientX - containerRect.left - offsetX;
     let newTop = e.clientY - containerRect.top - offsetY;
 
@@ -165,7 +200,7 @@ function onMouseUp(e) {
     let shortName = currentDrag.getAttribute("data-shortname");
 
     let bodyData = { short_name: shortName, x: newLeft, y: newTop };
-    fetch("{{ url_for('save_position') }}", {
+    fetch("{{ url_for('save_fantasy_position') }}", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(bodyData)

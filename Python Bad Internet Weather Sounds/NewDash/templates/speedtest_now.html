@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Ad-Hoc Speed Test</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<nav>
+  <a href="{{ url_for('index') }}">Home</a> |
+  <a href="{{ url_for('settings') }}">Settings</a> |
+  <a href="{{ url_for('school_map') }}">Map</a> |
+  <a href="{{ url_for('fantasy_map') }}">Fantasy Map</a> |
+  <span style="float:right;">📻 Test Now</span>
+</nav>
+
+{% if not finished %}
+  <h1>Running Speed Test...</h1>
+  <p>Please wait a few moments while we measure your download/upload speeds.</p>
+{% else %}
+  <h1>Speed Test Complete</h1>
+  <p><strong>Download:</strong> {{ download_str }} Mbps<br>
+     <strong>Upload:</strong> {{ upload_str }} Mbps</p>
+  <p>Result appended to <code>externalSpeeds.csv</code>.</p>
+  <p><a href="{{ url_for('school_map') }}">Return to Map</a></p>
+{% endif %}
+
+</body>
+</html>

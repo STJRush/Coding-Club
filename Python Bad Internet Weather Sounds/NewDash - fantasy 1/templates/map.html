@@ -4,68 +4,36 @@
     <meta charset="UTF-8" />
     <title>School Map</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-
-    <!-- For Plotly inlined usage, load Plotly CDN -->
-    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-
     <style>
-      .flex-container {
-        display: flex;
-      }
-      .left-panel {
-        width: 75%;
-        padding-right: 10px;
-      }
-      .right-panel {
-        width: 25%;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between; /* top speed + bottom chart */
-        padding-left: 10px;
-      }
-      .speed-result {
-        font-size: 1.5em; /* large font for the last speed */
-        color: #333;
-        text-align: center;
-        margin-bottom: 10px;
-      }
-      .speed-chart {
-        /* The Plotly chart or container gets the rest of the space */
-      }
-      /* Extra styling for feedback message */
-      .feedback-msg {
-        margin-top: 10px;
-        font-size: 1.1em;
-        color: #444;
-      }
+        /* This override makes the label fully transparent behind the text */
+        .map-label {
+            background-color: rgba(255,255,255,0.8);
+        }
     </style>
 </head>
 <body>
 
-    <nav>
-        <a href="{{ url_for('index') }}">Home</a> |
-        <a href="{{ url_for('settings') }}">Settings</a> |
-        <a href="{{ url_for('school_map') }}">Map</a> |
-        <a href="{{ url_for('fantasy_map') }}">Fantasy Map</a>
-        <span style="float:right;">
-          <a href="{{ url_for('run_speed_test') }}">📻 Test Now</a>
-        </span>
-    </nav>
+<nav>
+  <a href="{{ url_for('index') }}">Home</a> |
+  <a href="{{ url_for('settings') }}">Settings</a> |
+  <a href="{{ url_for('school_map') }}">Map</a> |
+  <a href="{{ url_for('fantasy_map') }}">Fantasy Map</a>
+</nav>
 
 <h1>Live School Map of Network</h1>
 <button id="edit-toggle">Enable Edit Mode</button>
 
-<div class="flex-container">
-  <div class="left-panel">
-    <div id="map-container" style="position:relative;">
-      <img src="{{ url_for('static', filename='map.png') }}"
-           alt="School Map"
-           width="672" height="950">
-      
-      {% for idx, row in targets_df.iterrows() %}
+<div id="map-container">
+    <!-- The normal map background -->
+    <img src="{{ url_for('static', filename='map.png') }}"
+         alt="School Map"
+         width="672" height="950">
+
+    {% for idx, row in targets_df.iterrows() %}
         {% set short_name = row["Short Name"] %}
         {% set device_type = row["Device Type"] %}
-        
+
+        {# Only render if this device type is visible #}
         {% if device_type in visible_device_types %}
             {% set x = row["MapX"] %}
             {% set y = row["MapY"] %}
@@ -84,35 +52,20 @@
 
             <div class="map-label {{ color_class }}"
                  data-shortname="{{ short_name }}"
-                 style="position:absolute; left: {{ x }}px; top: {{ y }}px;">
+                 style="left: {{ x }}px; top: {{ y }}px;">
                 {{ short_name }} {{ emoji }}
             </div>
         {% endif %}
-      {% endfor %}
-    </div>
-  </div>
-
-  <!-- Right Panel for Speed Info -->
-  <div class="right-panel">
-    <!-- Top half: Last speed test result in large font -->
-    <div class="speed-result">
-      {{ last_speed_str }}
-    </div>
-    <!-- Bottom half: Plotly chart -->
-    <div class="speed-chart">
-      {{ graph_html|safe }}
-    </div>
-    <!-- Feedback comparing latest speed to typical -->
-    <div class="feedback-msg">
-      {{ feedback_msg|safe }}
-    </div>
-  </div>
+    {% endfor %}
 </div>
 
 <script>
 const editToggleBtn = document.getElementById("edit-toggle");
 let editMode = false;
 
+/**
+ * Toggle edit mode button
+ */
 editToggleBtn.addEventListener("click", function() {
     editMode = !editMode;
     this.textContent = editMode ? "Disable Edit Mode" : "Enable Edit Mode";
@@ -133,6 +86,9 @@ let currentDrag = null;
 let offsetX = 0;
 let offsetY = 0;
 
+/**
+ * onMouseDown: start dragging a label
+ */
 function onMouseDown(e) {
     if (!editMode) return;
     currentDrag = e.target.closest(".map-label");
@@ -146,6 +102,9 @@ function onMouseDown(e) {
     document.addEventListener("mouseup", onMouseUp);
 }
 
+/**
+ * onMouseMove: move the label around
+ */
 function onMouseMove(e) {
     if (!editMode || !currentDrag) return;
     e.preventDefault();
@@ -158,12 +117,16 @@ function onMouseMove(e) {
     currentDrag.style.top = newTop + "px";
 }
 
+/**
+ * onMouseUp: finalize the drag, save new position
+ */
 function onMouseUp(e) {
     if (!editMode || !currentDrag) return;
     let newLeft = parseInt(currentDrag.style.left, 10);
     let newTop = parseInt(currentDrag.style.top, 10);
     let shortName = currentDrag.getAttribute("data-shortname");
 
+    // Save to server (normal map)
     let bodyData = { short_name: shortName, x: newLeft, y: newTop };
     fetch("{{ url_for('save_position') }}", {
         method: "POST",
