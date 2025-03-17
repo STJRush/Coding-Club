@@ -1,0 +1,100 @@
+Level,Language,Up,Down
+1,Finnish,Ylös,Alas
+2,Polish,Do góry,W dół
+3,French,En haut,En bas
+4,Spanish,Arriba,Abajo
+5,German,Oben,Unten
+6,Italian,Su,Giù
+7,Swedish,Upp,Ner
+8,Dutch,Omhoog,Omlaag
+9,Russian,Вверх,Вниз
+10,Portuguese,Cima,Baixo
+11,Danish,Op,Ned
+12,Norwegian,Opp,Ned
+13,Greek,Άνω (Ano),Κάτω (Kato)
+14,Turkish,Yukarı,Aşağı
+15,Arabic,فوق (Fawq),تحت (Taht)
+16,Hungarian,Felfelé,Lefelé
+17,Czech,Nahoru,Dolů
+18,Romanian,Sus,Jos
+19,Bulgarian,Горе (Gore),Долу (Dolu)
+20,Slovak,Hore,Dole
+21,Slovenian,Navzgor,Navzdol
+22,Estonian,Üles,Alla
+23,Latvian,Augšup,Lejup
+24,Lithuanian,Aukštyn,Žemyn
+25,Icelandic,Upp,Niður
+26,Maltese,Fuq,Taħt
+27,Hebrew,למעלה (L'ma'aleh),למטה (L'mateh)
+28,Chinese (Mandarin),上 (Shàng),下 (Xià)
+29,Japanese,上 (Ue),下 (Shita)
+30,Korean,위 (Wi),아래 (Arae)
+31,Vietnamese,Lên,Xuống
+32,Thai,ขึ้น (Khuen),ลง (Long)
+33,Indonesian,Atas,Bawah
+34,Malay,Atas,Bawah
+35,Hindi,ऊपर (Upar),नीचे (Neeche)
+36,Urdu,اوپر (Oopar),نیچے (Neeche)
+37,Bengali,উপর (Upor),নীচে (Niche)
+38,Tamil,மேல் (Mēl),கீழ் (Kīḻ)
+39,Telugu,పై (Pai),కింద (Kinda)
+40,Kannada,ಮೇಲೆ (Mēle),ಕೆಳಗೆ (Keḷage)
+41,Gujarati,ઉપર (Upar),નીચે (Neeche)
+42,Marathi,वर (Var),खाली (Khaali)
+43,Punjabi,ਉਪਰ (Upar),ਹੇਠਾਂ (Heṭhāṁ)
+44,Sinhala,උඩ (Uda),පහළ (Pahala)
+45,Nepali,माथि (Mathi),तल (Tala)
+46,Khmer,លើ (Ler),ក្រោម (Kraom)
+47,Burmese,အပေါ် (Apaung),အောက် (Auk)
+48,Lao,ຂຶ້ນ (Khun),ລົງ (Long)
+49,Swahili,Juu,Chini
+50,Zulu,Phezulu,Phansi
+51,Xhosa,Ngaphezulu,Ngaphantsi
+52,Afrikaans,Bo,Onder
+53,Amharic,ላይ (Lay),ታች (Tach)
+54,Somali,Sare,Hoos
+55,Yoruba,Loke,Isalẹ
+56,Igbo,Elu,N'okpuru
+57,Hausa,Sama,Kasa
+58,Basque,Goi,Behe
+59,Catalan,Dalt,Baix
+60,Galician,Ente,Baixo
+61,Welsh,i fyny,i lawr
+62,Irish Gaelic,Suas,Síos
+63,Scottish Gaelic,Suas,Sìos
+64,Breton,Su,Da-Heul
+65,Cornish,Ugh,Dhegh
+66,Manx,Er,Nee
+67,Frisian,Omheech,Omleech
+68,Luxembourgish,Eroun,Erof
+69,Serbian,Горе (Gore),Долу (Dolu)
+70,Croatian,Gore,Dolje
+71,Bosnian,Gore,Dolje
+72,Macedonian,Нагоре (Nagore),Надолу (Nadol)
+73,Albanian,Lart,Poshtë
+74,Persian (Farsi),بالا (Bālā),پایین (Pā'īn)
+75,Kurdish,Ser,Jêr
+76,Pashto,پورته (Porta),کښته (Kaṣhta)
+77,Azerbaijani,Yuxarı,Aşağı
+78,Armenian,Վեր (Ver),Ներքև (Nerkhev)
+79,Georgian,ზემოთ (Zemot),ქვემო (Kvemo)
+80,Ukrainian,Вгору (Vhoru),Униз (Unyz)
+81,Belarusian,Уверх (Uvyerkh),Уніз (Uniz)
+82,Elvish (Sindarin),Calen,Lû
+83,Dwarvish (Khuzdul),Baruk,Kibil
+84,Orcish (Black Speech),Ugh,Lugb
+85,Draconic,Sva,Ras
+86,Infernal,Zar,Thul
+87,Celestial,Aurea,Tenebrae
+88,Sylvan,Lúthien,Nargoth
+89,Undercommon,Fenn,Drass
+90,Primordial,Krug,Thun
+91,Gnomish,Sprig,Plunk
+92,Halfling,Upwight,Downwight
+93,Goblin,Skrit,Skrap
+94,Tiefling,Astra,Inferna
+95,Auran,Zephy,Gloom
+96,Aquan,Sur,Ghur
+97,Ignan,Flam,Cinder
+98,Terran,Summit,Chasm
+99,Esperanto,Supren,Malsupren
