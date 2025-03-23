@@ -1,7 +1,27 @@
 import csv
 import random
+import cv2
+import threading
+import time
+import pygame
+import numpy as np
 
-# Load the outcome table from CSV into a dictionary
+# Global variables for controlling the audio and video threads.
+risk_volume = 0.1  # default volume is 10%
+stop_audio = False
+stop_video = False
+current_vortex_speed = 0.3  # initial video speed
+
+# Global channels for audio fade out.
+music_channel = None
+crackle_channel = None
+
+# Reinitialize pygame mixer with custom parameters (adjustable for testing)
+pygame.mixer.quit()
+pygame.mixer.init(frequency=44100, size=-16, channels=2, buffer=512)
+print("Pygame mixer initialized with frequency=44100, size=-16, channels=2, buffer=512.")
+
+# Load the outcome table from CSV into a dictionary.
 def load_outcome_table(filename):
     outcome_table = {}
     with open(filename, newline='', encoding='utf-8') as csvfile:
@@ -14,7 +34,7 @@ def load_outcome_table(filename):
             }
     return outcome_table
 
-# Load door labels from CSV into a dictionary keyed by level
+# Load door labels from CSV into a dictionary keyed by level.
 def load_door_labels(filename):
     door_labels = {}
     with open(filename, newline='', encoding='utf-8') as csvfile:
@@ -32,22 +52,188 @@ def map_d4_to_outcome(d4_roll):
     mapping = {1: 6, 2: 9, 3: 12, 4: 14}
     return mapping.get(d4_roll, 10)
 
-def call_to_abyss(current_level, outcome_table):
-    print(f"\n[Call to the Abyss] - Current Abyss Level: {current_level}")
-    if current_level <= 4:
-        print("You are in the shallow layers. Please roll a d4 (enter a number between 1 and 4):")
-        roll = int(input("Your d4 roll: "))
-        while roll < 1 or roll > 4:
-            print("Invalid roll. Please enter a number between 1 and 4:")
-            roll = int(input("Your d4 roll: "))
-        outcome_roll = map_d4_to_outcome(roll)
-        print(f"(Your d4 roll of {roll} maps to an outcome roll of {outcome_roll}.)")
+def map_risk_roll(roll, dice_max):
+    """
+    Map the player's roll from the chosen dice to a value between 1 and 20.
+    For d4 we use a custom mapping; for others we linearly interpolate.
+    """
+    if dice_max == 4:
+        mapping = {1: 6, 2: 9, 3: 12, 4: 14}
+        return mapping[roll]
     else:
-        print("Please roll a d20 (enter a number between 1 and 20):")
-        outcome_roll = int(input("Your d20 roll: "))
-        while outcome_roll < 1 or outcome_roll > 20:
-            print("Invalid roll. Please enter a number between 1 and 20:")
-            outcome_roll = int(input("Your d20 roll: "))
+        new_roll = 1 + (roll - 1) * (19 / (dice_max - 1))
+        return round(new_roll)
+
+def get_vortex_speed_from_dice(dice_max):
+    """
+    Returns the playback speed factor for the vortex video.
+    For 1d4, speed is 0.3x; for 1d20, speed is 2.0x; linear interpolation for intermediate dice.
+    """
+    if dice_max == 4:
+        return 0.3
+    else:
+        return 0.3 + (2.0 - 0.3) * ((dice_max - 4) / (20 - 4))
+
+def get_crackle_volume(dice_max):
+    """
+    Returns the volume for the crackle.ogg sound.
+    For 1d4, volume is 0.2 (20%), and for 1d20, volume is 1.0 (100%).
+    Linear interpolation for intermediate dice.
+    """
+    if dice_max == 4:
+        return 0.2
+    else:
+        return 0.2 + (dice_max - 4) * ((1.0 - 0.2) / (20 - 4))
+
+def play_vortex_video():
+    """
+    Plays the video 'vortex.mp4' in a loop.
+    The playback speed is controlled via the global 'current_vortex_speed'.
+    The loop exits when the global 'stop_video' flag is set.
+    """
+    cap = cv2.VideoCapture("vortex.mp4")
+    if not cap.isOpened():
+        print("Error: Could not open vortex.mp4")
+        return
+    fps = cap.get(cv2.CAP_PROP_FPS)
+    if fps <= 0:
+        fps = 30  # fallback
+    while not stop_video:
+        ret, frame = cap.read()
+        if not ret:
+            cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
+            continue
+        delay = int(1000 / fps / current_vortex_speed)
+        cv2.imshow("Vortex", frame)
+        if cv2.waitKey(delay) & 0xFF == ord('q'):
+            break
+    cap.release()
+    # Do not destroy the window here; let fade_out handle it.
+
+def play_abyss_audio():
+    """
+    Plays two audio streams concurrently using separate channels:
+      - 'music.mp3' on channel 0 at full volume.
+      - 'crackle.ogg' on channel 1 with volume set by the global 'risk_volume'.
+    Updates the crackle volume periodically until stop_audio is True.
+    """
+    global risk_volume, stop_audio, music_channel, crackle_channel
+    music_sound = pygame.mixer.Sound("music.mp3")
+    crackle_sound = pygame.mixer.Sound("crackle.ogg")
+    
+    music_channel = pygame.mixer.Channel(0)
+    crackle_channel = pygame.mixer.Channel(1)
+    
+    music_channel.play(music_sound, loops=-1)
+    music_channel.set_volume(1.0)
+    
+    crackle_channel.play(crackle_sound, loops=-1)
+    crackle_channel.set_volume(risk_volume)
+    
+    print("Audio channels started: music on channel 0, crackle on channel 1.")
+    
+    while not stop_audio:
+        crackle_channel.set_volume(risk_volume)
+        time.sleep(0.5)
+    
+    music_channel.stop()
+    crackle_channel.stop()
+
+def fade_out():
+    """
+    Gradually reduces the video playback speed to 0.5x and then displays a black frame
+    for 3 seconds to simulate a fade to black. Concurrently, fades out the music volume.
+    Plays a crash sound ("crash.ogg") at the start.
+    """
+    global current_vortex_speed, music_channel
+    print("Playing crash sound...")
+    crash_sound = pygame.mixer.Sound("crash.ogg")
+    crash_sound.play()
+    
+    # Fade out video speed from current value to 0.5x.
+    fade_duration = 5.0  # seconds
+    fade_steps = 20
+    step_delay = fade_duration / fade_steps
+    target_speed = 0.5
+    initial_speed = current_vortex_speed
+    speed_diff = initial_speed - target_speed
+    print("Fading video speed...")
+    for i in range(fade_steps):
+        current_vortex_speed = initial_speed - speed_diff * ((i+1) / fade_steps)
+        time.sleep(step_delay)
+    
+    # Instead of a continuous fade loop, display one black frame for 3 seconds.
+    print("Fading video to black...")
+    black_frame = np.zeros((480, 640, 3), dtype=np.uint8)  # adjust resolution if needed
+    cv2.imshow("Vortex", black_frame)
+    cv2.waitKey(3000)  # Wait 3000ms (3 seconds)
+    cv2.destroyWindow("Vortex")
+    
+    # Fade out music volume gradually.
+    print("Fading out music...")
+    initial_music_volume = music_channel.get_volume() if music_channel else 1.0
+    for i in range(fade_steps):
+        new_vol = initial_music_volume * (1 - ((i+1) / fade_steps))
+        if music_channel:
+            music_channel.set_volume(new_vol)
+        time.sleep(step_delay)
+
+def call_to_abyss(current_level, outcome_table):
+    global current_vortex_speed, stop_audio, risk_volume, stop_video
+    print(f"\n[Call to the Abyss] - Current Abyss Level: {current_level}")
+    
+    # Start vortex video in a separate thread.
+    current_vortex_speed = 0.3  # initial speed
+    stop_video = False
+    video_thread = threading.Thread(target=play_vortex_video)
+    video_thread.start()
+    
+    # Start audio playback in a separate thread.
+    risk_volume = 0.1  # default initial volume is now 10%
+    stop_audio = False
+    audio_thread = threading.Thread(target=play_abyss_audio)
+    audio_thread.start()
+    
+    # Let the player choose their risk die.
+    print("Choose your risk die:")
+    print("1. 1d4")
+    print("2. 1d8")
+    print("3. 1d10")
+    print("4. 1d12")
+    print("5. 1d20")
+    dice_choice = input("Enter your choice (1-5): ").strip()
+    while dice_choice not in ["1", "2", "3", "4", "5"]:
+        print("Invalid choice. Please enter a number between 1 and 5.")
+        dice_choice = input("Enter your choice (1-5): ").strip()
+        
+    dice_options = {
+         "1": {"type": "d4", "max": 4},
+         "2": {"type": "d8", "max": 8},
+         "3": {"type": "d10", "max": 10},
+         "4": {"type": "d12", "max": 12},
+         "5": {"type": "d20", "max": 20}
+    }
+    chosen_dice = dice_options[dice_choice]
+    dice_max = chosen_dice["max"]
+    
+    # Update vortex speed and crackle volume based on chosen risk die.
+    current_vortex_speed = get_vortex_speed_from_dice(dice_max)
+    risk_volume = get_crackle_volume(dice_max)
+    print(f"Vortex video speed updated to {current_vortex_speed:.1f}x and crackle volume set to {risk_volume*100:.0f}% based on your chosen risk die ({chosen_dice['type']}).")
+    
+    # Play the 'strike.ogg' sound to signal risk level selection.
+    strike_sound = pygame.mixer.Sound("strike.ogg")
+    strike_sound.play()
+    
+    # Prompt the player to roll their chosen die.
+    print(f"Please roll your {chosen_dice['type']} (enter a number between 1 and {dice_max}):")
+    roll = int(input(f"Your {chosen_dice['type']} roll: "))
+    while roll < 1 or roll > dice_max:
+         print(f"Invalid roll. Please enter a number between 1 and {dice_max}:")
+         roll = int(input(f"Your {chosen_dice['type']} roll: "))
+    
+    outcome_roll = map_risk_roll(roll, dice_max)
+    print(f"(Your {chosen_dice['type']} roll of {roll} maps to an outcome roll of {outcome_roll}.)")
     
     outcome = outcome_table.get(outcome_roll, {"Result": "Unknown", "Description": "No description available."})
     wish = input("State your wish: ")
@@ -55,14 +241,21 @@ def call_to_abyss(current_level, outcome_table):
     print("\n" + "="*40)
     print(narrative)
     print("="*40 + "\n")
+    
+    # Instead of abruptly stopping, fade out the video and audio.
+    fade_out()
+    
+    # Stop the audio and video threads.
+    stop_audio = True
+    audio_thread.join()
+    stop_video = True
+    video_thread.join()
 
 def summon_door(current_level, door_labels):
     print("\n[Summon a Door]")
-    # Ensure current level doesn't exceed available door labels (use level 99 if so)
     label_level = current_level if current_level <= 99 else 99
     labels = door_labels.get(label_level, {"Language": "Unknown", "Up": "Up", "Down": "Down"})
     
-    # Randomly assign door roles: one door is "up" and the other is "down"
     if random.random() < 0.5:
         door1_role = "up"
         door2_role = "down"
@@ -70,11 +263,9 @@ def summon_door(current_level, door_labels):
         door1_role = "down"
         door2_role = "up"
     
-    # Prepare the door labels using the lost language words.
     door1_label = labels["Up"] if door1_role == "up" else labels["Down"]
     door2_label = labels["Up"] if door2_role == "up" else labels["Down"]
     
-    # Display the doors to the players.
     print(f"In the language of {labels['Language']}, you see two doors:")
     print(f"   Door 1: '{door1_label}'")
     print(f"   Door 2: '{door2_label}'")
@@ -97,7 +288,7 @@ def summon_door(current_level, door_labels):
         else:
             new_level = current_level - 1
             print(f"You choose Door {choice}. It leads upward—you ascend one level! ⬆️")
-    else:  # chosen == "down"
+    else:
         new_level = current_level + 1
         print(f"You choose Door {choice}. It leads downward—you descend one level! ⬇️")
     
@@ -113,7 +304,7 @@ def main():
     while True:
         print(f"Current Abyss Level: {current_level}")
         if current_level <= 4:
-            print("In these shallow layers, your wishes are limited. (Use a d4, which maps to outcomes between 6 and 14.)")
+            print("In these shallow layers, your wishes are limited.")
         else:
             print("In these deeper layers, roll a d20 for your wish outcomes.")
         
@@ -124,6 +315,9 @@ def main():
         choice = input("Enter your choice (1/2/3): ")
         
         if choice == "1":
+            global stop_audio, stop_video
+            stop_audio = False
+            stop_video = False
             call_to_abyss(current_level, outcome_table)
         elif choice == "2":
             current_level = summon_door(current_level, door_labels)
