@@ -1,10 +1,18 @@
+
+print("Welcome to the Abyss")
+import numpy as np
+import cv2
 import csv
 import random
-import cv2
 import threading
 import time
 import pygame
 import numpy as np
+from openai import OpenAI
+from mysecrets import API_KEY  # Import your API key from mysecrets.py
+
+# Initialize the OpenAI client using the API key from mysecrets.py.
+client = OpenAI(api_key=API_KEY)
 
 # Global variables for controlling the audio and video threads.
 risk_volume = 0.1  # default volume is 10%
@@ -21,7 +29,6 @@ pygame.mixer.quit()
 pygame.mixer.init(frequency=44100, size=-16, channels=2, buffer=512)
 print("Pygame mixer initialized with frequency=44100, size=-16, channels=2, buffer=512.")
 
-# Load the outcome table from CSV into a dictionary.
 def load_outcome_table(filename):
     outcome_table = {}
     with open(filename, newline='', encoding='utf-8') as csvfile:
@@ -34,7 +41,6 @@ def load_outcome_table(filename):
             }
     return outcome_table
 
-# Load door labels from CSV into a dictionary keyed by level.
 def load_door_labels(filename):
     door_labels = {}
     with open(filename, newline='', encoding='utf-8') as csvfile:
@@ -108,7 +114,7 @@ def play_vortex_video():
         if cv2.waitKey(delay) & 0xFF == ord('q'):
             break
     cap.release()
-    # Do not destroy the window here; let fade_out handle it.
+    # Do not call cv2.destroyAllWindows() here.
 
 def play_abyss_audio():
     """
@@ -130,7 +136,7 @@ def play_abyss_audio():
     crackle_channel.play(crackle_sound, loops=-1)
     crackle_channel.set_volume(risk_volume)
     
-    print("Audio channels started: music on channel 0, crackle on channel 1.")
+    #print("Audio channels started: music on channel 0, crackle on channel 1.")
     
     while not stop_audio:
         crackle_channel.set_volume(risk_volume)
@@ -141,42 +147,59 @@ def play_abyss_audio():
 
 def fade_out():
     """
-    Gradually reduces the video playback speed to 0.5x and then displays a black frame
-    for 3 seconds to simulate a fade to black. Concurrently, fades out the music volume.
+    Gradually reduces the vortex video playback speed back to 0.3x.
+    Then prompts the user: "Press ENTER to close the vortex and fade out music."
+    Once ENTER is pressed, the program will fade out the music volume and then close the OpenCV window.
     Plays a crash sound ("crash.ogg") at the start.
     """
-    global current_vortex_speed, music_channel
-    print("Playing crash sound...")
+    global current_vortex_speed, music_channel, stop_video
+    #print("Playing crash sound...")
     crash_sound = pygame.mixer.Sound("crash.ogg")
     crash_sound.play()
+    #print("Crash sound played.")
     
-    # Fade out video speed from current value to 0.5x.
+    # Fade out video speed from current value back to 0.3x.
     fade_duration = 5.0  # seconds
     fade_steps = 20
     step_delay = fade_duration / fade_steps
-    target_speed = 0.5
+    target_speed = 0.3
     initial_speed = current_vortex_speed
     speed_diff = initial_speed - target_speed
-    print("Fading video speed...")
+    #print(f"Fading video speed from {initial_speed} to {target_speed} over {fade_steps} steps.")
     for i in range(fade_steps):
         current_vortex_speed = initial_speed - speed_diff * ((i+1) / fade_steps)
+        # Uncomment for debugging:
+        # print(f"Fade step {i+1}/{fade_steps}: current_vortex_speed = {current_vortex_speed:.2f}")
         time.sleep(step_delay)
+    #print("Video speed fade-out complete.")
     
-    # Instead of a continuous fade loop, display one black frame for 3 seconds.
-    print("Fading video to black...")
-    black_frame = np.zeros((480, 640, 3), dtype=np.uint8)  # adjust resolution if needed
-    cv2.imshow("Vortex", black_frame)
-    cv2.waitKey(3000)  # Wait 3000ms (3 seconds)
-    cv2.destroyWindow("Vortex")
+    # Now prompt the user to close the vortex.
+    input("Press ENTER to close the vortex and fade out music...")
+    
+    # Signal the video thread to stop.
+    print("Setting stop_video flag to True.")
+    stop_video = True
+    time.sleep(0.5)  # Allow time for the video thread to finish its loop.
+    
+    # Close OpenCV windows.
+    print("Closing OpenCV windows...")
+    cv2.destroyAllWindows()
+    print("OpenCV windows closed.")
     
     # Fade out music volume gradually.
     print("Fading out music...")
+    fade_duration = 5.0  # seconds
+    fade_steps = 20
+    step_delay = fade_duration / fade_steps
     initial_music_volume = music_channel.get_volume() if music_channel else 1.0
     for i in range(fade_steps):
         new_vol = initial_music_volume * (1 - ((i+1) / fade_steps))
         if music_channel:
             music_channel.set_volume(new_vol)
+        # Uncomment for debugging:
+        # print(f"Music fade step {i+1}/{fade_steps}: volume set to {new_vol:.2f}")
         time.sleep(step_delay)
+    print("Music fade-out complete.")
 
 def call_to_abyss(current_level, outcome_table):
     global current_vortex_speed, stop_audio, risk_volume, stop_video
@@ -189,10 +212,13 @@ def call_to_abyss(current_level, outcome_table):
     video_thread.start()
     
     # Start audio playback in a separate thread.
-    risk_volume = 0.1  # default initial volume is now 10%
+    risk_volume = 0.1  # default initial volume is 10%
     stop_audio = False
     audio_thread = threading.Thread(target=play_abyss_audio)
     audio_thread.start()
+    
+    # Prompt the player to state their wish first.
+    wish = input("State your wish: ")
     
     # Let the player choose their risk die.
     print("Choose your risk die:")
@@ -236,13 +262,28 @@ def call_to_abyss(current_level, outcome_table):
     print(f"(Your {chosen_dice['type']} roll of {roll} maps to an outcome roll of {outcome_roll}.)")
     
     outcome = outcome_table.get(outcome_roll, {"Result": "Unknown", "Description": "No description available."})
-    wish = input("State your wish: ")
-    narrative = f"Your wish was: '{wish}'\nOutcome ({outcome_roll} - {outcome['Result']}): {outcome['Description']}"
+    
+    # Use the ChatGPT completions API to generate the narrative.
+    system_message = (
+        f"You are the magical abyss. A player has rolled a {outcome_roll} on the dice. "
+        f"The outcome is '{outcome['Result']}'. {outcome['Description']} "
+        "Describe in the second person tense, in bullet points, 4 ways in which the player's wish is affected by this outcome. Ensure that these outcomes are not game breaking and maximize narrative potential and player engagement."
+    )
+    user_message = wish
+    print("Generating narrative response from ChatGPT...")
+    completion = client.chat.completions.create(
+        model="gpt-4o",
+        messages=[
+            {"role": "system", "content": system_message},
+            {"role": "user", "content": user_message}
+        ]
+    )
+    narrative = completion.choices[0].message.content
     print("\n" + "="*40)
     print(narrative)
     print("="*40 + "\n")
     
-    # Instead of abruptly stopping, fade out the video and audio.
+    # Fade out the video speed and audio only after the user presses ENTER.
     fade_out()
     
     # Stop the audio and video threads.
