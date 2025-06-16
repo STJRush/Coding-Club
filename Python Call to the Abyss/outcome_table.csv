@@ -8,14 +8,14 @@ Roll,Outcome,Description
 7,Amnesia,"Loss of all memories relating to your goal (e.g., you asked for Olives but now you can't recall what an olive is or why you would ever want one)"
 8,Material Loss,"Loss of any related equipment or information (e.g., loss of all maps, keys, and clues)"
 9,Loss of Purpose,"Forgetting your request (e.g., 'I asked for something?')"
-10,Nothing happens,"Absolutely nothing happens"
+10,Nothing happens,Absolutely nothing happens
 11,A Sign,"You have a vision, insight, or feeling that may help achieve your goal"
-12,A Clue,"You find a helpful item that will continually assist you in achieving your goal"
-13,Knowledge,"Permanent advantage on checks towards achieving your goal"
+12,A Clue,You find a helpful item that will continually assist you in achieving your goal
+13,Knowledge,Permanent advantage on checks towards achieving your goal
 14,Treasure,"A magical item that helps you with your goal (e.g., if you asked for olives, this would give you a compass that points to olive trees)"
 15,Skill,"You can advantage on all checks related to this goal (e.g., if you asked for olives, this would give you a advantage looking for one)"
-16,Destiny,"You can a sixth sense or a spirit guide to help you achieve your goal"
+16,Destiny,You can a sixth sense or a spirit guide to help you achieve your goal
 17,Beginnings,"You get a small preview of what you asked for (eg. if you asked for olives, this would give you seeds)"
-18,In Part,"You get part of what you asked"
-19,Flawed,"This is 90% of what you asked for but with one small flaw that could come back to haunt you later"
-20,Olives,"This is all of what you asked for and a handful of delicious ripe olives as a bonus"
+18,In Part,You get part of what you asked
+19,Flawed,This is 90% of what you asked for but with one small flaw that could come back to haunt you later
+20,All of what you want,You get all of what you asked for. 

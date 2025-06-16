@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Pip-Boy Radiation Monitor</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        body {
+            background: linear-gradient(to bottom, #242d20 0%, #151a11 100%);
+            color: #39ff14;
+            font-family: 'Courier New', Courier, monospace;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .crt {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .crt:before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(to bottom,
+                    rgba(57, 255, 20, 0.09) 0px,
+                    rgba(57, 255, 20, 0.13) 2px,
+                    transparent 3px,
+                    transparent 6px);
+            pointer-events: none;
+            z-index: 2;
+            animation: crtFlicker 0.3s infinite alternate;
+        }
+
+        .crt:after {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom,
+                    rgba(255, 255, 255, 0.05) 0%,
+                    rgba(255, 255, 255, 0.01) 30%,
+                    rgba(0, 0, 0, 0.10) 100%);
+            pointer-events: none;
+            z-index: 3;
+        }
+
+        @keyframes crtFlicker {
+            0% {
+                opacity: 0.93;
+            }
+
+            100% {
+                opacity: 1.00;
+            }
+        }
+
+        .pipboy-container {
+            width: 92vw;
+            margin: 0 auto;
+            padding-bottom: 32px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #39ff14;
+            text-shadow: 0 0 8px #39ff14;
+            margin-top: 20px;
+        }
+
+        .section-title {
+            color: #39ff14;
+            font-size: 1.3em;
+            font-family: inherit;
+            margin: 30px 0 8px 18px;
+            text-shadow: 0 0 6px #39ff14;
+        }
+
+        /* 5-WIDGET GRID */
+        .widget-row {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 18px;
+            margin: 24px 0 18px 0;
+            align-items: stretch;
+        }
+
+        .widget {
+            background: rgba(36, 45, 32, 0.93);
+            border: 2px solid #39ff14;
+            border-radius: 11px;
+            box-shadow: 0 0 13px #39ff1440;
+            padding: 14px 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 140px;
+        }
+
+        .status-widget {
+            min-width: 120px;
+            font-size: 1.18em;
+            font-weight: bold;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #status-text {
+            text-align: center;
+            color: #39ff14;
+            background: none;
+            font-family: 'Courier New', Courier, monospace;
+            min-height: 32px;
+            display: inline-block;
+            font-size: 1.32em;
+            font-weight: bold;
+            text-shadow: 0 0 6px #39ff14, 0 0 12px #39ff1480, 0 0 2px #257c13;
+            letter-spacing: 1px;
+            padding: 10px 6px;
+        }
+
+        .gauge-widget {
+            min-width: 150px;
+        }
+
+        .gif-widget {
+            min-width: 80px;
+        }
+
+        .radio-widget {
+            min-width: 150px;
+            font-size: 1.02em;
+        }
+
+        .gauge-title {
+            text-align: center;
+            margin-bottom: 2px;
+            font-size: 1.08em;
+            color: #39ff14;
+            opacity: 0.89;
+            font-family: inherit;
+        }
+
+        #cpm-gauge-label,
+        #usvh-gauge-label {
+            position: absolute;
+            left: 50%;
+            top: 61%;
+            transform: translate(-50%, -50%);
+            font-size: 2.1em;
+            color: #39ff14;
+            text-shadow: 0 0 8px #39ff14, 0 0 2px #2a7c13;
+            font-family: inherit;
+        }
+
+        #cpm-units,
+        #usvh-units {
+            position: absolute;
+            left: 50%;
+            top: 77%;
+            transform: translate(-50%, -50%);
+            font-size: 1em;
+            color: #39ff14;
+            opacity: 0.8;
+        }
+
+        #allgood-img {
+            width: 100%;
+            height: 100%;
+            min-height: 90px;
+            min-width: 90px;
+            max-width: 160px;
+            max-height: 160px;
+            object-fit: contain;
+            border-radius: 10px;
+            box-shadow: 0 0 14px #39ff1470, 0 0 50px #39ff1420;
+            vertical-align: middle;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .gif-widget {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 140px;
+        }
+
+        /* Fallout radio styles */
+        .pipboy-radio-btn {
+            background: rgba(20, 40, 20, 0.94);
+            border: 2.5px solid #39ff14;
+            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            box-shadow: 0 0 9px #39ff1490, 0 0 21px #39ff1440;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            outline: none;
+            margin-right: 8px;
+            margin-left: 0;
+            transition: border-color 0.2s, background 0.17s;
+            position: relative;
+            padding: 0;
+        }
+
+        .pipboy-radio-btn:active,
+        .pipboy-radio-btn:focus {
+            border-color: #b6ffb0;
+            background: rgba(60, 100, 60, 0.85);
+        }
+
+        #radio-icon {
+            color: #39ff14;
+            text-shadow: 0 0 7px #39ff1477, 0 0 2px #39ff14;
+            font-family: 'Courier New', Courier, monospace;
+            font-weight: bold;
+            letter-spacing: 2px;
+            margin-left: 1px;
+            margin-top: -1px;
+            display: block;
+            width: 100%;
+            text-align: center;
+            pointer-events: none;
+            font-size: 1.55em;
+        }
+
+        .pipboy-track-label-radio {
+            font-size: 1.12em;
+            color: #39ff14;
+            font-family: 'Courier New', Courier, monospace;
+            letter-spacing: 2px;
+            text-shadow: 0 0 7px #39ff14, 0 0 2px #39ff1440;
+            font-weight: bold;
+            border: none;
+            box-shadow: none;
+            background: none;
+            padding: 0;
+            text-align: left;
+        }
+
+        .pipboy-track-label {
+            font-size: 1.12em;
+            color: #0f3;
+            font-family: 'Courier New', Courier, monospace;
+            padding: 5px 12px;
+            border: 1.2px solid #39ff14;
+            border-radius: 5px;
+            box-shadow: 0 0 8px #39ff1455;
+            background: rgba(36, 45, 32, 0.65);
+            letter-spacing: 1.2px;
+            margin-left: 0;
+            text-shadow: 0 0 5px #39ff14, 0 0 2px #39ff1440;
+            font-weight: bold;
+        }
+
+
+
+        @media (max-width: 900px) {
+            .widget-row {
+                grid-template-columns: 1fr 1fr;
+                grid-template-rows: repeat(3, auto);
+                gap: 10px;
+            }
+
+            .widget {
+                min-width: 0;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .widget-row {
+                grid-template-columns: 1fr;
+                grid-template-rows: repeat(5, auto);
+                gap: 8px;
+            }
+        }
+
+        /* LIVE INDICATOR ETC */
+        .live-indicator {
+            position: absolute;
+            top: 24px;
+            right: 34px;
+            width: 18px;
+            height: 18px;
+            background: #39ff14;
+            border-radius: 50%;
+            box-shadow: 0 0 16px 4px #39ff14a0, 0 0 32px 6px #39ff1480;
+            border: 2.5px solid #25610f;
+            animation: pulse 1.4s infinite;
+            z-index: 9;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 10px 2px #39ff14a0, 0 0 10px 2px #39ff1480;
+            }
+
+            50% {
+                box-shadow: 0 0 24px 8px #39ff14a0, 0 0 32px 10px #39ff1480;
+            }
+
+            100% {
+                box-shadow: 0 0 10px 2px #39ff14a0, 0 0 10px 2px #39ff1480;
+            }
+        }
+
+        .flicker {
+            animation: flicker 0.17s infinite alternate;
+        }
+
+        @keyframes flicker {
+            from {
+                opacity: 0.92;
+            }
+
+            to {
+                opacity: 1.0;
+            }
+        }
+
+        .radio-player-vertical {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            gap: 9px;
+            margin-top: 2px;
+        }
+
+        .radio-tower-icon {
+            height: 76px;
+            width: 76px;
+            margin: 0 0 7px 0;
+            filter: drop-shadow(0 0 14px #39ff14cc);
+            background: transparent;
+            border-radius: 7px;
+            object-fit: contain;
+            display: block;
+        }
+
+        .pipboy-radio-btn {
+            background: rgba(20, 40, 20, 0.94);
+            border: 2.5px solid #39ff14;
+            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            box-shadow: 0 0 9px #39ff1490, 0 0 21px #39ff1440;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            outline: none;
+            margin: 0 0 2px 0;
+            transition: border-color 0.2s, background 0.17s;
+            position: relative;
+            padding: 0;
+        }
+
+        pipboy-radio-btn:active,
+        .pipboy-radio-btn:focus {
+            border-color: #b6ffb0;
+            background: rgba(60, 100, 60, 0.85);
+        }
+
+        .radio-track-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            width: 100%;
+        }
+
+
+        .pipboy-radio-btn-inline {
+            background: none;
+            border: none;
+            outline: none;
+            margin: 0 3px 0 0;
+            padding: 0;
+            cursor: pointer;
+            color: #39ff14;
+            display: flex;
+            align-items: center;
+            font-size: 1.2em;
+            text-shadow: 0 0 7px #39ff14, 0 0 2px #39ff14;
+        }
+
+        .radio-icon-triangle {
+            font-size: 1.18em;
+            color: #39ff14;
+            text-shadow: 0 0 7px #39ff14, 0 0 2px #39ff14;
+            font-family: 'Courier New', Courier, monospace;
+            margin: 0 0 0 0;
+            padding: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="crt">
+        <div class="live-indicator" id="live-indicator" title="LIVE"></div>
+        <div class="pipboy-container">
+            <h1>Location: North Dublin Territory</h1>
+            <!-- 5-WIDGET GRID -->
+            <div class="widget-row">
+                <div class="widget status-widget">
+                    <div id="status-text">..stand by...</div>
+                </div>
+                <div class="widget gauge-widget">
+                    <div class="gauge-title">CPM</div>
+                    <div style="position:relative; width:150px; height:110px; margin:0 auto;">
+                        <svg id="cpm-gauge" width="150" height="110">
+                            <path id="cpm-gauge-bg" d="" stroke="#24491b" stroke-width="20" fill="none" />
+                            <path id="cpm-gauge-fg" d="" stroke="#39ff14" stroke-width="20" fill="none"
+                                filter="url(#glowcpm)" />
+                            <g id="cpm-gauge-ticks"></g>
+                            <defs>
+                                <filter id="glowcpm">
+                                    <feGaussianBlur stdDeviation="3.5" result="coloredBlur" />
+                                    <feMerge>
+                                        <feMergeNode in="coloredBlur" />
+                                        <feMergeNode in="SourceGraphic" />
+                                    </feMerge>
+                                </filter>
+                            </defs>
+                        </svg>
+                        <div id="cpm-gauge-label" class="flicker">--</div>
+                        <div id="cpm-units">CPM</div>
+                    </div>
+                </div>
+                <div class="widget gauge-widget">
+                    <div class="gauge-title">uSv/h</div>
+                    <div style="position:relative; width:150px; height:110px; margin:0 auto;">
+                        <svg id="usvh-gauge" width="150" height="110">
+                            <path id="usvh-gauge-bg" d="" stroke="#24491b" stroke-width="20" fill="none" />
+                            <path id="usvh-gauge-fg" d="" stroke="#24e041" stroke-width="20" fill="none"
+                                filter="url(#glowusvh)" />
+                            <g id="usvh-gauge-ticks"></g>
+                            <defs>
+                                <filter id="glowusvh">
+                                    <feGaussianBlur stdDeviation="3.5" result="coloredBlur" />
+                                    <feMerge>
+                                        <feMergeNode in="coloredBlur" />
+                                        <feMergeNode in="SourceGraphic" />
+                                    </feMerge>
+                                </filter>
+                            </defs>
+                        </svg>
+                        <div id="usvh-gauge-label" class="flicker">--</div>
+                        <div id="usvh-units">uSv/h</div>
+                    </div>
+                </div>
+                <div class="widget gif-widget" style="display: flex; align-items: center; justify-content: center;">
+                    <img id="allgood-img" src="/static/all_good.gif" alt="All Good">
+                </div>
+                <!-- Fallout-style Radio Widget -->
+                <div class="widget radio-widget">
+                    <div id="radio-player" class="radio-player-vertical">
+                        <img src="/static/tower_icon.png" alt="Radio Tower" class="radio-tower-icon">
+                        <div class="radio-track-row">
+                            <button id="radio-playpause" class="pipboy-radio-btn-inline" title="Play/Pause">
+                                <span id="radio-icon" class="radio-icon-triangle">&#9654;</span>
+                            </button>
+                            <span id="radio-tracktitle" class="pipboy-track-label-radio">Track 1</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- End grid -->
+            <div class="section-title">Last Few Days (Smoothed)</div>
+            <div id="chart_days" style="width: 100%; height: 42vh; margin-bottom: 10px;"></div>
+            <div class="section-title">Live (Most Recent 10 Values, uSv/h)</div>
+            <div id="chart_live" style="width: 100%; height: 30vh;"></div>
+        </div>
+    </div>
+    <audio id="radio-audio" preload="auto"></audio>
+    <script>
+        // CPM Gauge Drawing
+        function drawGauge(gaugeId, value, minVal, maxVal, color, labelId, unitsId, unitStr, ticksId) {
+            value = Math.max(minVal, Math.min(maxVal, value));
+            let startAngle = 130, endAngle = 410;
+            let percent = (value - minVal) / (maxVal - minVal);
+            let angle = startAngle + (endAngle - startAngle) * percent;
+            function polarToXY(cx, cy, r, angleDeg) {
+                let rad = (angleDeg - 90) * Math.PI / 180.0;
+                return [cx + r * Math.cos(rad), cy + r * Math.sin(rad)];
+            }
+            let R = 50, cx = 75, cy = 90; // Dial size tweak for 150x110
+            let bgStart = polarToXY(cx, cy, R, startAngle);
+            let bgEnd = polarToXY(cx, cy, R, endAngle);
+            let bgArc = [
+                "M", ...bgStart,
+                "A", R, R, 0, 1, 1, ...bgEnd
+            ].join(" ");
+            document.getElementById(gaugeId + '-bg').setAttribute('d', bgArc);
+            let fgEnd = polarToXY(cx, cy, R, angle);
+            let largeArc = (angle - startAngle) > 180 ? 1 : 0;
+            let fgArc = [
+                "M", ...bgStart,
+                "A", R, R, 0, largeArc, 1, ...fgEnd
+            ].join(" ");
+            document.getElementById(gaugeId + '-fg').setAttribute('d', fgArc);
+            // Draw ticks
+            let ticks = '';
+            for (let t = 0; t <= 6; t++) {
+                let tickAngle = startAngle + (endAngle - startAngle) * (t / 6);
+                let [x1, y1] = polarToXY(cx, cy, R + 11, tickAngle);
+                let [x2, y2] = polarToXY(cx, cy, R + 1, tickAngle);
+                ticks += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${color}" stroke-width="3"/>`;
+                let [lx, ly] = polarToXY(cx, cy, R + 22, tickAngle);
+                let v = minVal + (maxVal - minVal) * (t / 6);
+                let vStr = unitStr === "uSv/h" ? v.toFixed(2) : Math.round(v);
+                ticks += `<text x="${lx}" y="${ly + 4}" fill="${color}" font-size="11" text-anchor="middle" font-family="Courier">${vStr}</text>`;
+            }
+            document.getElementById(ticksId).innerHTML = ticks;
+            // Label
+            let lbl = document.getElementById(labelId);
+            lbl.textContent = (value !== null && value !== undefined && !isNaN(value)) ? (unitStr === "uSv/h" ? value.toFixed(2) : value) : '--';
+            document.getElementById(unitsId).textContent = unitStr;
+        }
+        // Moving average helper
+        function movingAverage(data, windowSize) {
+            let result = [];
+            for (let i = 0; i < data.length; i++) {
+                let start = Math.max(0, i - windowSize + 1);
+                let subset = data.slice(start, i + 1).filter(x => x !== null && !isNaN(x));
+                if (subset.length === 0) {
+                    result.push(null);
+                } else {
+                    let sum = subset.reduce((a, b) => a + b, 0);
+                    result.push(sum / subset.length);
+                }
+            }
+            return result;
+        }
+        // Fallout Radio Player
+        const trackCount = 10; // Number of tracks (track1.mp3 to track10.mp3)
+        let radioTracks = [];
+        for (let i = 1; i <= trackCount; i++) {
+            radioTracks.push(`/static/track${i}.mp3`);
+        }
+        const radioTitles = [
+            "Track 1", "Track 2", "Track 3", "Track 4", "Track 5",
+            "Track 6", "Track 7", "Track 8", "Track 9", "Track 10"
+        ];
+        let currentTrack = 0;
+        let isPlaying = false;
+        const audioElem = document.getElementById('radio-audio');
+        const playPauseBtn = document.getElementById('radio-playpause');
+        const trackTitleElem = document.getElementById('radio-tracktitle');
+        const radioIcon = document.getElementById('radio-icon');
+        function setRadioTrack(idx) {
+            if (idx < 0) idx = radioTracks.length - 1;
+            if (idx >= radioTracks.length) idx = 0;
+            currentTrack = idx;
+            audioElem.src = radioTracks[currentTrack];
+            trackTitleElem.textContent = radioTitles[currentTrack] || `Track ${currentTrack + 1}`;
+        }
+        function playRadio() {
+            audioElem.play();
+            isPlaying = true;
+            radioIcon.textContent = '||';
+        }
+        function pauseRadio() {
+            audioElem.pause();
+            isPlaying = false;
+            radioIcon.textContent = '▶';
+        }
+        playPauseBtn.onclick = function () {
+            if (isPlaying) { pauseRadio(); } else { playRadio(); }
+        };
+        audioElem.onended = function () {
+            setRadioTrack(currentTrack + 1);
+            playRadio();
+        };
+        trackTitleElem.onclick = function () {
+            setRadioTrack(currentTrack + 1);
+            if (isPlaying) playRadio();
+        };
+        setRadioTrack(0);
+
+        // Sound and live indicator from earlier code
+        let lastCPM = null;
+        function playClick() {
+            let snd = document.getElementById('click-sound');
+            if (snd) {
+                snd.currentTime = 0;
+                snd.play();
+            }
+        }
+        function animateLiveIndicator() {
+            const el = document.getElementById('live-indicator');
+            el.style.boxShadow = "0 0 34px 10px #39ff14, 0 0 60px 15px #39ff1480";
+            setTimeout(() => {
+                el.style.boxShadow = "";
+            }, 350);
+        }
+        function getStatusText(usvh) {
+            if (usvh < 0.02) return "Less than normal radiation. Possible lead shielding area";
+            if (usvh < 0.16) return "Normal background radiation levels";
+            if (usvh < 0.23) return "Radiation levels: Not great, not terrible.";
+            if (usvh < 0.31) return "Possible radon gas radiation spike. Increase ventilation.";
+            if (usvh < 0.51) return "DANGER: Elevated Radiation Levels";
+            return "EXTREME DANGER: HIGH RADS! GO TO SHELTER NOW!";
+        }
+        function fetchDataAndPlot() {
+            fetch("/live-data")
+                .then(resp => resp.json())
+                .then(data => {
+                    let times = data.times.map(t => new Date(t));
+                    let cpm = data.cpm;
+                    let usv = data.usv;
+                    // Dials
+                    if (cpm.length && usv.length) {
+                        let mostRecentCPM = cpm[cpm.length - 1];
+                        let mostRecentuSv = usv[usv.length - 1];
+                        if (mostRecentCPM !== lastCPM && !isNaN(mostRecentCPM)) {
+                            drawGauge('cpm-gauge', mostRecentCPM, 0, 40, '#39ff14', 'cpm-gauge-label', 'cpm-units', 'CPM', 'cpm-gauge-ticks');
+                            drawGauge('usvh-gauge', mostRecentuSv, 0, 0.3, '#24e041', 'usvh-gauge-label', 'usvh-units', 'uSv/h', 'usvh-gauge-ticks');
+                            animateLiveIndicator();
+                            playClick();
+                            lastCPM = mostRecentCPM;
+                        }
+                        else if (!isNaN(mostRecentCPM)) {
+                            drawGauge('cpm-gauge', mostRecentCPM, 0, 40, '#39ff14', 'cpm-gauge-label', 'cpm-units', 'CPM', 'cpm-gauge-ticks');
+                            drawGauge('usvh-gauge', mostRecentuSv, 0, 0.3, '#24e041', 'usvh-gauge-label', 'usvh-units', 'uSv/h', 'usvh-gauge-ticks');
+                        }
+                        // Update status
+                        setStatusTypewriter(getStatusText(mostRecentuSv));
+                    }
+                    // Smoother top chart: larger moving avg window
+                    let windowSize = 48; // ~12min smoothing if 15s interval
+                    let cpm_avg = movingAverage(cpm, windowSize);
+                    let usv_avg = movingAverage(usv, windowSize);
+                    let traceDaysCPM = {
+                        x: times,
+                        y: cpm_avg,
+                        mode: 'lines',
+                        name: 'CPM (Moving Avg)',
+                        line: { color: '#39ff14', width: 4 },
+                        yaxis: 'y1'
+                    };
+                    let traceDaysuSv = {
+                        x: times,
+                        y: usv_avg,
+                        mode: 'lines',
+                        name: 'uSv/h (Moving Avg)',
+                        line: { color: '#24e041', dash: 'dot', width: 3 },
+                        yaxis: 'y2'
+                    };
+                    let layoutDays = {
+                        plot_bgcolor: 'rgba(20,30,10,1)',
+                        paper_bgcolor: 'rgba(0,0,0,0)',
+                        font: { color: '#39ff14', family: 'Courier New, monospace', size: 18 },
+                        xaxis: {
+                            title: 'Time',
+                            showgrid: false,
+                            tickformat: '%b %d %H:%M'
+                        },
+                        yaxis: {
+                            title: 'CPM (Avg)',
+                            color: '#39ff14',
+                            showgrid: false
+                        },
+                        yaxis2: {
+                            title: 'uSv/h (Avg)',
+                            overlaying: 'y',
+                            side: 'right',
+                            color: '#24e041',
+                            showgrid: false
+                        },
+                        legend: { x: 0, y: 1.12, orientation: 'h', font: { size: 14 } },
+                        margin: { t: 40, l: 70, r: 70, b: 50 }
+                    };
+                    Plotly.newPlot('chart_days', [traceDaysCPM, traceDaysuSv], layoutDays, { displayModeBar: false });
+                    // Bottom chart: most recent 10, ONLY uSv/h (no CPM)
+                    let last10 = Math.max(0, usv.length - 10);
+                    let traceLiveuSv = {
+                        x: times.slice(last10),
+                        y: usv.slice(last10),
+                        mode: 'lines+markers',
+                        name: 'uSv/h',
+                        line: { color: '#24e041', dash: 'dot', width: 3 },
+                        marker: { color: '#24e041', size: 10 }
+                    };
+                    let layoutLive = {
+                        plot_bgcolor: 'rgba(20,30,10,1)',
+                        paper_bgcolor: 'rgba(0,0,0,0)',
+                        font: { color: '#39ff14', family: 'Courier New, monospace', size: 20 },
+                        xaxis: {
+                            title: 'Time',
+                            showgrid: false,
+                            tickformat: '%H:%M:%S'
+                        },
+                        yaxis: {
+                            title: 'uSv/h',
+                            showgrid: false
+                        },
+                        legend: { x: 0, y: 1.15, orientation: 'h', font: { size: 14 } },
+                        margin: { t: 30, l: 60, r: 30, b: 50 }
+                    };
+                    Plotly.newPlot('chart_live', [traceLiveuSv], layoutLive, { displayModeBar: false });
+                });
+        }
+
+        // Typewriter effect for status text
+        function setStatusTypewriter(text) {
+            const el = document.getElementById('status-text');
+            let i = 0;
+            el.textContent = "";
+            function type() {
+                if (i < text.length) {
+                    el.textContent += text.charAt(i);
+                    i++;
+                    setTimeout(type, 55); // speed of typing
+                }
+            }
+            type();
+        }
+
+        fetchDataAndPlot();
+        setInterval(fetchDataAndPlot, 15000); // update every 15 seconds
+    </script>
+    <!-- Geiger click sound -->
+    <audio id="click-sound"
+        src="data:audio/wav;base64,UklGRiwAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQgAAAD8AgEA/gABAAMAAgAEAAIAAAEAAAD/AQAA/wEAAAEAAgAAAgABAAAAAAEAAgACAAIAAwABAAIAAwACAAIAAAEAAAD/AQAA/wEAAP8AAQABAAIAAA=="
+        preload="auto"></audio>
+</body>
+
+</html>
