@@ -2,15 +2,196 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Kayaking GO/NO GO</title>
+    <title>Activity Safety Check</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
-    <h1 class="{{ status_class }}">{{ status }}</h1>
-    <div class="details">
-        <p><strong>Wind Speed:</strong> {{ wind_speed }} m/s</p>
-        <p><strong>Wind Direction:</strong> {{ wind_direction }}°</p>
-        <p><strong>Decision Rule:</strong> {{ decision_rule }}</p>
+    <!-- Wind arrow overlay -->
+    <img id="wind-arrow" src="http://quacksolution.com/wind_arrow.png" alt="Wind arrow">
+
+    <div class="form-wrapper">
+        <h1>Water Activity GO/NO GO</h1>
+        <div id="loading-message" class="loading-message" style="display:none;">
+            Loading latest weather data from Dublin Airport...
+        </div>
+        <form method="post" class="input-form">
+            <label for="location">Location:</label>
+            <select name="location" id="location">
+                {% for loc in locations %}
+                <option value="{{ loc }}" {% if loc == form_data.location %}selected{% endif %}>{{ loc }}</option>
+                {% endfor %}
+            </select><br>
+
+            <label for="environment">Environment:</label>
+            <select name="environment" id="environment">
+                {% for env in environments %}
+                <option value="{{ env }}" {% if env == form_data.environment %}selected{% endif %}>{{ env }}</option>
+                {% endfor %}
+            </select><br>
+            <p id="env-definition" class="env-definition">{{ env_definitions[form_data.environment] }}</p>
+
+            <label for="distance">Distance from shore (m):</label>
+            <input type="number" step="1" min="0" name="distance" id="distance" value="{{ form_data.distance }}" required><br>
+
+            <label for="wind_speed">Wind speed (km/h):</label>
+            <input type="number" step="0.1" name="wind_speed" id="wind_speed" value="{{ form_data.wind_speed }}" required><br>
+
+            <label for="wind_direction">Wind direction (deg):</label>
+            <input type="number" step="1" min="0" max="360" name="wind_direction" id="wind_direction" value="{{ form_data.wind_direction }}" required>
+            <br>
+
+            <h3 class="subheading">Participants</h3>
+
+            <label for="solo_participants">Solo craft participants:</label>
+            <input type="number" min="0" name="solo_participants" id="solo_participants" value="{{ form_data.solo_participants }}" required><br>
+
+            <label for="crew_participants">Crew craft participants:</label>
+            <input type="number" min="0" name="crew_participants" id="crew_participants" value="{{ form_data.crew_participants }}" required><br>
+
+            <h3 class="subheading">Instructors</h3>
+
+            <label for="level1_coaches">BCAB Paddlesport/CANI Level 1</label>
+            <input type="number" min="0" name="level1_coaches" id="level1_coaches" value="{{ form_data.level1_coaches }}" required><br>
+
+            <label for="level3_coaches">BCAB Coach/CANI Level 3</label>
+            <input type="number" min="0" name="level3_coaches" id="level3_coaches" value="{{ form_data.level3_coaches }}" required><br>
+
+            <button type="submit" class="action-btn">Check again with above values</button>
+                        <br>
+            <button type="button" id="reload-weather" class="action-btn">Reload Current Conditions from Met Éireann</button>
+
+            <div id="current-conditions-section" class="current-conditions-section">
+                <h3 class="subheading">Current Conditions</h3>
+                <p id="current-conditions" class="current-conditions"></p>
+            </div>
+        </form>
+
+        {% if decision %}
+        <h2 class="{{ decision_class }}">{{ decision }}</h2>
+        <ul class="reasons">
+            {% for r in reasons %}
+            <li>{{ r }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+		<a href="https://britishcanoeingawarding.org.uk/wp-content/files/01042018BCABEnvironmentalDefinitionsDeploymentGuidanceForInstructorsCoachesLeadersV2-4Jan23.pdf">See full BCAB Guidlines here</a>
     </div>
+
+    <script>
+        const locationImages = {
+            "Skerries Sailing Club": "http://quacksolution.com/SkerriesSailingClub.jpg",
+            "Skerries South Beach": "http://quacksolution.com/SkerriesSouthBeach.png"
+        };
+
+        const locationSelect = document.getElementById('location');
+        const windDirInput = document.getElementById('wind_direction');
+        const windArrow = document.getElementById('wind-arrow');
+        const windSpeedInput = document.getElementById('wind_speed');
+        const arrowImages = {
+            1: "http://quacksolution.com/force1.png",
+            2: "http://quacksolution.com/force2.png",
+            3: "http://quacksolution.com/force3.png",
+            4: "http://quacksolution.com/force4.png"
+        };
+        const envDefinitions = {{ env_definitions | tojson }};
+        const envSelect = document.getElementById('environment');
+
+        function updateEnvDefinition() {
+            document.getElementById('env-definition').textContent = envDefinitions[envSelect.value];
+        }
+        function beaufortForce(speed) {
+            if (speed >= 1 && speed <= 5) return 1;
+            if (speed >= 6 && speed <= 11) return 2;
+            if (speed >= 12 && speed <= 19) return 3;
+            if (speed >= 20 && speed <= 28) return 4;
+            return null;
+        }
+
+        function beaufortForceDescription(speed) {
+            const force = beaufortForce(speed);
+            if (force === 1) return 'Force 1 Light Air';
+            if (force === 2) return 'Force 2 Light Breeze';
+            if (force === 3) return 'Force 3 Gentle Breeze';
+            if (force === 4) return 'Force 4 Moderate Breeze';
+            return 'Calm';
+        }
+
+        function cardinalDirection(angle) {
+            const dirs = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
+            const index = Math.round((angle % 360) / 45) % 8;
+            return dirs[index];
+        }
+
+        function updateCurrentConditions() {
+            const speed = parseFloat(windSpeedInput.value) || 0;
+            const dir = parseFloat(windDirInput.value) || 0;
+            const text = `${speed} km/h from ${cardinalDirection(dir)} - ${beaufortForceDescription(speed)}`;
+            document.getElementById('current-conditions').textContent = text;
+        }
+
+        function updateBackground() {
+            const url = locationImages[locationSelect.value];
+            if (url) {
+                document.body.style.backgroundImage = `url('${url}')`;
+            }
+        }
+
+        function updateWindArrow() {
+            const angle = parseFloat(windDirInput.value) || 0;
+            const speed = parseFloat(windSpeedInput.value) || 0;
+            const force = beaufortForce(speed);
+            if (force) {
+                windArrow.src = arrowImages[force];
+            } else {
+                windArrow.src = "http://quacksolution.com/wind_arrow.png";
+            }
+            windArrow.style.transform = `rotate(${angle - 180}deg)`;
+        }
+
+        locationSelect.addEventListener('change', updateBackground);
+        envSelect.addEventListener('change', updateEnvDefinition);
+        windDirInput.addEventListener('input', () => { updateWindArrow(); updateCurrentConditions(); });
+        windSpeedInput.addEventListener('input', () => { updateWindArrow(); updateCurrentConditions(); });
+
+        // Initialize on load
+        updateBackground();
+        updateWindArrow();
+        updateEnvDefinition();
+        updateCurrentConditions();
+        const reloadBtn = document.getElementById('reload-weather');
+        if (reloadBtn) {
+            reloadBtn.addEventListener('click', () => {
+                window.location.href = '/';
+            });
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            {% if not decision %}
+            const loading = document.getElementById('loading-message');
+            loading.style.display = 'block';
+            fetch('/wind')
+                .then(r => r.json())
+                .then(data => {
+                    if (!data.error) {
+                        windSpeedInput.value = data.speed;
+                        windDirInput.value = data.direction;
+                    } else {
+                        loading.textContent = 'Could not load weather data.';
+                    }
+                    updateWindArrow();
+                    updateCurrentConditions();
+                })
+                .catch(() => {
+                    loading.textContent = 'Could not load weather data.';
+                })
+                .finally(() => {
+                    setTimeout(() => {
+                        loading.style.display = 'none';
+                        document.querySelector('.input-form').submit();
+                    }, 1000);
+                });
+            {% endif %}
+        });
+    </script>
 </body>
 </html>
