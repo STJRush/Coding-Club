@@ -718,5 +718,5 @@ if __name__ == '__main__':
         topics.append(sample_topic)
         save_topics(topics)
 
-    print('Starting server on http://127.0.0.1:5000/')
-    app.run(debug=False, port=6006)
+    print('Starting server on http://127.0.0.1:5010/')
+    app.run(debug=False, port=5010)
